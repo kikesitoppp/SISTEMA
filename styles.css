@@ -1,0 +1,55 @@
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f4f4f4;
+    text-align: center;
+    padding: 20px;
+}
+
+.container {
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+    width: 300px;
+    margin: 0 auto;
+}
+
+h1 {
+    color: #333;
+}
+
+label {
+    margin-right: 10px;
+}
+
+input {
+    padding: 5px;
+    margin: 10px 0;
+    width: 80%;
+}
+
+button {
+    background-color: #4CAF50;
+    color: white;
+    padding: 10px;
+    border: none;
+    cursor: pointer;
+    width: 100%;
+    margin: 10px 0;
+}
+
+button:hover {
+    background-color: #45a049;
+}
+
+#error-msg {
+    color: red;
+}
+
+#transaccion-msg {
+    color: green;
+}
+
+#resumen-total, #resumen-promedio {
+    color: #333;
+}
