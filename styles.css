@@ -54,7 +54,10 @@ button:hover {
     color: #333;
 }
 
-#stock-section p {
-    color: #333;
-    margin: 5px 0;
+#stock-section, #stock-list {
+    margin-top: 20px;
+}
+
+#stock-msg {
+    color: green;
 }
