@@ -10,6 +10,7 @@
     <div class="container">
         <h1>Sistema Contable Simple</h1>
         
+        <!-- Sección de inicio de sesión -->
         <div id="login-section">
             <h2>Iniciar Sesión</h2>
             <label for="usuario">Usuario:</label>
@@ -22,12 +23,15 @@
             <p id="error-msg"></p>
         </div>
         
+        <!-- Sección de acciones -->
         <div id="acciones-section" style="display: none;">
             <button onclick="mostrarAgregarTransaccion()">Agregar Transacción</button>
             <button onclick="generarResumen()">Generar Resumen Diario</button>
+            <button onclick="mostrarStock()">Ver Stock</button> <!-- Nuevo botón de stock -->
             <button onclick="cerrarSesion()">Salir</button>
         </div>
 
+        <!-- Sección para agregar transacción -->
         <div id="transaccion-section" style="display: none;">
             <h2>Agregar Transacción</h2>
             <label for="referencia">Referencia del Producto:</label>
@@ -40,13 +44,19 @@
             <p id="transaccion-msg"></p>
         </div>
 
+        <!-- Sección para el resumen diario -->
         <div id="resumen-section" style="display: none;">
             <h2>Resumen Diario</h2>
             <p id="resumen-total"></p>
             <p id="resumen-promedio"></p>
         </div>
+        
+        <!-- Sección para mostrar el inventario -->
+        <div id="stock-section" style="display: none;"></div>
+
     </div>
 
     <script src="app.js"></script>
 </body>
 </html>
+
