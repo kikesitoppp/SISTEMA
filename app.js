@@ -7,10 +7,7 @@ const usuarios = {
 let transacciones = [];
 
 // Inventario de productos
-let inventario = {
-    'producto1': 10, // Ejemplo de producto con su existencia inicial
-    'producto2': 5
-};
+let inventario = {};
 
 // Autenticar usuario
 function iniciarSesion() {
@@ -25,12 +22,26 @@ function iniciarSesion() {
     }
 }
 
+// Agregar o actualizar stock de producto
+function actualizarStock() {
+    const producto = document.getElementById('producto').value;
+    const cantidad = parseInt(document.getElementById('cantidad').value);
+    
+    if (producto && cantidad >= 0) {
+        inventario[producto] = cantidad;
+        document.getElementById('stock-msg').innerText = `Stock actualizado: ${producto} tiene ${cantidad} unidades.`;
+        mostrarStock(); // Actualizar la lista de stock en pantalla
+    } else {
+        document.getElementById('stock-msg').innerText = 'Por favor, ingresa un producto y una cantidad válida.';
+    }
+}
+
 // Agregar transacción y reducir stock
 function agregarTransaccion() {
     const referencia = document.getElementById('referencia').value;
     const valor = parseFloat(document.getElementById('valor').value);
     
-    if (referencia && valor && inventario[referencia] >= 1) {
+    if (referencia && valor && inventario[referencia] > 0) {
         inventario[referencia] -= 1; // Reducir el stock en 1
         const fecha = new Date();
         const transaccion = { referencia, valor, fecha };
@@ -38,6 +49,7 @@ function agregarTransaccion() {
         
         document.getElementById('transaccion-msg').innerText = `Transacción agregada. Stock restante de ${referencia}: ${inventario[referencia]}`;
         document.getElementById('transaccion-section').style.display = 'none';
+        mostrarStock(); // Actualizar el inventario visualmente
     } else {
         document.getElementById('transaccion-msg').innerText = 'Stock insuficiente o datos incompletos.';
     }
@@ -56,24 +68,22 @@ function generarResumen() {
     document.getElementById('resumen-section').style.display = 'block';
 }
 
-// Mostrar formulario para agregar transacción
-function mostrarAgregarTransaccion() {
-    document.getElementById('transaccion-section').style.display = 'block';
-    document.getElementById('resumen-section').style.display = 'none';
-}
-
 // Mostrar inventario de productos
 function mostrarStock() {
-    const stockSection = document.getElementById('stock-section');
-    stockSection.innerHTML = '<h2>Inventario de Productos</h2>';
+    const stockSection = document.getElementById('stock-list');
+    stockSection.innerHTML = '';
     
     for (const [producto, existencias] of Object.entries(inventario)) {
         const productoInfo = document.createElement('p');
         productoInfo.innerText = `${producto}: ${existencias} en stock`;
         stockSection.appendChild(productoInfo);
     }
-    
-    stockSection.style.display = 'block';
+}
+
+// Mostrar formulario para agregar transacción
+function mostrarAgregarTransaccion() {
+    document.getElementById('transaccion-section').style.display = 'block';
+    document.getElementById('resumen-section').style.display = 'none';
 }
 
 // Cerrar sesión
@@ -81,4 +91,3 @@ function cerrarSesion() {
     document.getElementById('acciones-section').style.display = 'none';
     document.getElementById('login-section').style.display = 'block';
 }
-
