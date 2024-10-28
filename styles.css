@@ -53,3 +53,8 @@ button:hover {
 #resumen-total, #resumen-promedio {
     color: #333;
 }
+
+#stock-section p {
+    color: #333;
+    margin: 5px 0;
+}
