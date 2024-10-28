@@ -6,6 +6,12 @@ const usuarios = {
 // Lista de transacciones
 let transacciones = [];
 
+// Inventario de productos
+let inventario = {
+    'producto1': 10, // Ejemplo de producto con su existencia inicial
+    'producto2': 5
+};
+
 // Autenticar usuario
 function iniciarSesion() {
     const usuario = document.getElementById('usuario').value;
@@ -19,22 +25,25 @@ function iniciarSesion() {
     }
 }
 
-// Agregar transacción
+// Agregar transacción y reducir stock
 function agregarTransaccion() {
     const referencia = document.getElementById('referencia').value;
     const valor = parseFloat(document.getElementById('valor').value);
     
-    if (referencia && valor) {
+    if (referencia && valor && inventario[referencia] >= 1) {
+        inventario[referencia] -= 1; // Reducir el stock en 1
         const fecha = new Date();
         const transaccion = { referencia, valor, fecha };
         transacciones.push(transaccion);
         
-        document.getElementById('transaccion-msg').innerText = 'Transacción agregada';
+        document.getElementById('transaccion-msg').innerText = `Transacción agregada. Stock restante de ${referencia}: ${inventario[referencia]}`;
         document.getElementById('transaccion-section').style.display = 'none';
+    } else {
+        document.getElementById('transaccion-msg').innerText = 'Stock insuficiente o datos incompletos.';
     }
 }
 
-// Generar resumen
+// Generar resumen diario de ventas
 function generarResumen() {
     const hoy = new Date().toISOString().split('T')[0];
     const ventasHoy = transacciones.filter(t => t.fecha.toISOString().split('T')[0] === hoy).map(t => t.valor);
@@ -53,8 +62,23 @@ function mostrarAgregarTransaccion() {
     document.getElementById('resumen-section').style.display = 'none';
 }
 
+// Mostrar inventario de productos
+function mostrarStock() {
+    const stockSection = document.getElementById('stock-section');
+    stockSection.innerHTML = '<h2>Inventario de Productos</h2>';
+    
+    for (const [producto, existencias] of Object.entries(inventario)) {
+        const productoInfo = document.createElement('p');
+        productoInfo.innerText = `${producto}: ${existencias} en stock`;
+        stockSection.appendChild(productoInfo);
+    }
+    
+    stockSection.style.display = 'block';
+}
+
 // Cerrar sesión
 function cerrarSesion() {
     document.getElementById('acciones-section').style.display = 'none';
     document.getElementById('login-section').style.display = 'block';
 }
+
