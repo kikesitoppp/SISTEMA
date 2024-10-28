@@ -24,21 +24,21 @@ function iniciarSesion() {
 
 // Agregar o actualizar stock de producto
 function actualizarStock() {
-    const producto = document.getElementById('producto').value;
-    const cantidad = parseInt(document.getElementById('cantidad').value);
+    const producto = document.getElementById('producto').value.trim();
+    const cantidad = parseInt(document.getElementById('cantidad').value, 10);
     
-    if (producto && cantidad >= 0) {
+    if (producto && !isNaN(cantidad) && cantidad >= 0) {
         inventario[producto] = cantidad;
         document.getElementById('stock-msg').innerText = `Stock actualizado: ${producto} tiene ${cantidad} unidades.`;
         mostrarStock(); // Actualizar la lista de stock en pantalla
     } else {
-        document.getElementById('stock-msg').innerText = 'Por favor, ingresa un producto y una cantidad válida.';
+        document.getElementById('stock-msg').innerText = 'Por favor, ingresa un producto válido y una cantidad mayor o igual a 0.';
     }
 }
 
 // Agregar transacción y reducir stock
 function agregarTransaccion() {
-    const referencia = document.getElementById('referencia').value;
+    const referencia = document.getElementById('referencia').value.trim();
     const valor = parseFloat(document.getElementById('valor').value);
     
     if (referencia && valor && inventario[referencia] > 0) {
@@ -71,7 +71,7 @@ function generarResumen() {
 // Mostrar inventario de productos
 function mostrarStock() {
     const stockSection = document.getElementById('stock-list');
-    stockSection.innerHTML = '';
+    stockSection.innerHTML = ''; // Limpiar la lista antes de mostrar el inventario
     
     for (const [producto, existencias] of Object.entries(inventario)) {
         const productoInfo = document.createElement('p');
@@ -90,4 +90,5 @@ function mostrarAgregarTransaccion() {
 function cerrarSesion() {
     document.getElementById('acciones-section').style.display = 'none';
     document.getElementById('login-section').style.display = 'block';
+    document.getElementById('stock-section').style.display = 'block';
 }
