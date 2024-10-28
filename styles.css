@@ -42,7 +42,7 @@ button:hover {
     background-color: #45a049;
 }
 
-#error-msg {
+#error-msg, #stock-msg, #transaccion-msg {
     color: red;
 }
 
@@ -56,8 +56,4 @@ button:hover {
 
 #stock-section, #stock-list {
     margin-top: 20px;
-}
-
-#stock-msg {
-    color: green;
 }
