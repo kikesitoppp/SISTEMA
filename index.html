@@ -147,36 +147,19 @@
             <p id="transaccion-msg"></p>
         </div>
 
-        <!-- Sección de pronóstico de demanda -->
-        <div id="pronostico-section" style="display: none;">
-            <h2>Pronóstico de Demanda</h2>
-            <label for="tipo-pronostico">Selecciona el tipo de pronóstico:</label>
-            <select id="tipo-pronostico" onchange="mostrarCamposHistoricos()">
-                <option value="">Seleccionar</option>
-                <option value="dia">Por día</option>
-                <option value="mes">Por mes</option>
-                <option value="año">Por año</option>
-            </select>
-            <div id="valores-historicos" style="display: none; margin-top: 10px;">
-                <label for="historial">Ingrese los valores históricos separados por comas:</label>
-                <input type="text" id="historial" placeholder="Ejemplo: 20, 30, 25, 28"><br>
-                <button onclick="calcularPronostico()">Calcular Pronóstico</button>
-                <p id="pronostico-msg"></p>
-            </div>
-        </div>
-
         <!-- Sección para el resumen diario -->
         <div id="resumen-section" style="display: none;">
             <h2>Resumen Diario</h2>
             <p id="resumen-total"></p>
+            <p id="resumen-productos"></p>
             <p id="resumen-promedio"></p>
         </div>
     </div>
 
     <script>
-        // Variables para almacenar el estado de sesión y stock
         let sesionIniciada = false;
         let inventario = {};
+        let ventasDiarias = {};
 
         function iniciarSesion() {
             const usuario = document.getElementById("usuario").value;
@@ -209,6 +192,7 @@
                     inventario[producto] += cantidad;
                 } else {
                     inventario[producto] = cantidad;
+                    ventasDiarias[producto] = 0; // Inicializa las ventas en cero para el producto
                 }
                 document.getElementById("stock-msg").textContent = "Stock actualizado.";
                 document.getElementById("producto").value = "";
@@ -241,6 +225,7 @@
 
             if (inventario[referencia] && inventario[referencia] >= cantidadVendida) {
                 inventario[referencia] -= cantidadVendida;
+                ventasDiarias[referencia] += cantidadVendida;
                 document.getElementById("transaccion-msg").textContent = "Transacción registrada y stock actualizado.";
                 document.getElementById("referencia").value = "";
                 document.getElementById("valor").value = "";
@@ -251,48 +236,28 @@
             }
         }
 
-        function mostrarPronostico() {
-            document.getElementById("pronostico-section").style.display = "block";
-        }
-
-        function mostrarCamposHistoricos() {
-            const tipo = document.getElementById("tipo-pronostico").value;
-            document.getElementById("valores-historicos").style.display = tipo ? "block" : "none";
-        }
-
-        function calcularPronostico() {
-            const historial = document.getElementById("historial").value.split(",").map(Number);
-            if (historial.length < 2 || historial.includes(NaN)) {
-                document.getElementById("pronostico-msg").textContent = "Por favor, ingrese al menos dos valores numéricos válidos.";
-                return;
-            }
-
-            // Implementación de regresión lineal simple
-            const n = historial.length;
-            const x = Array.from({length: n}, (_, i) => i + 1);
-            const sumX = x.reduce((a, b) => a + b, 0);
-            const sumY = historial.reduce((a, b) => a + b, 0);
-            const sumXY = x.reduce((sum, xi, i) => sum + xi * historial[i], 0);
-            const sumX2 = x.reduce((sum, xi) => sum + xi * xi, 0);
-            
-            const slope = (n * sumXY - sumX * sumY) / (n * sumX2 - sumX * sumX);
-            const intercept = (sumY - slope * sumX) / n;
-
-            const pronostico = slope * (n + 1) + intercept;
-            document.getElementById("pronostico-msg").textContent = `Pronóstico para el próximo período: ${pronostico.toFixed(2)}`;
-        }
-
         function generarResumen() {
             let totalVentas = 0;
             let totalProductos = 0;
+            let totalCantidadVendida = 0;
 
+            // Generar resumen por producto
+            let resumenProductos = "Resumen de productos vendidos y existencias:\n";
             for (let producto in inventario) {
+                const cantidadVendida = ventasDiarias[producto];
+                resumenProductos += `Producto: ${producto}, Vendido: ${cantidadVendida} unidades, Existencias: ${inventario[producto]} unidades\n`;
+                totalCantidadVendida += cantidadVendida;
                 totalProductos += inventario[producto];
-                totalVentas += inventario[producto] * 10;  // Valor ficticio para ejemplo
+                totalVentas += cantidadVendida * 10;  // Valor ficticio para ejemplo
             }
 
+            // Calcular el promedio de ventas
+            const promedioVentas = totalCantidadVendida > 0 ? (totalVentas / totalCantidadVendida).toFixed(2) : 0;
+
+            // Mostrar el resumen en pantalla
             document.getElementById("resumen-total").textContent = `Total de productos en stock: ${totalProductos}`;
-            document.getElementById("resumen-promedio").textContent = `Valor promedio por producto: $${(totalVentas / totalProductos).toFixed(2)}`;
+            document.getElementById("resumen-productos").textContent = resumenProductos;
+            document.getElementById("resumen-promedio").textContent = `Promedio de ventas: $${promedioVentas}`;
             document.getElementById("resumen-section").style.display = "block";
         }
     </script>
