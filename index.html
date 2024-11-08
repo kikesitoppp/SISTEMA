@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sistema Contable Simple</title>
+    <title>Sistema Contable Simple con Pronóstico de Demanda</title>
     <style>
         /* Estilos generales */
         body {
@@ -150,8 +150,19 @@
         <!-- Sección de pronóstico de demanda -->
         <div id="pronostico-section" style="display: none;">
             <h2>Pronóstico de Demanda</h2>
-            <button onclick="calcularPronostico()">Calcular Pronóstico</button>
-            <p id="pronostico-msg"></p>
+            <label for="tipo-pronostico">Selecciona el tipo de pronóstico:</label>
+            <select id="tipo-pronostico" onchange="mostrarCamposHistoricos()">
+                <option value="">Seleccionar</option>
+                <option value="dia">Por día</option>
+                <option value="mes">Por mes</option>
+                <option value="año">Por año</option>
+            </select>
+            <div id="valores-historicos" style="display: none; margin-top: 10px;">
+                <label for="historial">Ingrese los valores históricos separados por comas:</label>
+                <input type="text" id="historial" placeholder="Ejemplo: 20, 30, 25, 28"><br>
+                <button onclick="calcularPronostico()">Calcular Pronóstico</button>
+                <p id="pronostico-msg"></p>
+            </div>
         </div>
 
         <!-- Sección para el resumen diario -->
@@ -228,15 +239,15 @@
             const valor = parseFloat(document.getElementById("valor").value);
             const cantidadVendida = parseInt(document.getElementById("cantidad-vendida").value);
 
-            if (referencia in inventario && cantidadVendida <= inventario[referencia]) {
+            if (inventario[referencia] && inventario[referencia] >= cantidadVendida) {
                 inventario[referencia] -= cantidadVendida;
-                document.getElementById("transaccion-msg").textContent = "Transacción añadida correctamente.";
+                document.getElementById("transaccion-msg").textContent = "Transacción registrada y stock actualizado.";
                 document.getElementById("referencia").value = "";
                 document.getElementById("valor").value = "";
                 document.getElementById("cantidad-vendida").value = "";
                 actualizarListaProductos();
             } else {
-                document.getElementById("transaccion-msg").textContent = "Producto no encontrado o cantidad insuficiente en stock.";
+                document.getElementById("transaccion-msg").textContent = "Stock insuficiente o producto no encontrado.";
             }
         }
 
@@ -244,8 +255,31 @@
             document.getElementById("pronostico-section").style.display = "block";
         }
 
+        function mostrarCamposHistoricos() {
+            const tipo = document.getElementById("tipo-pronostico").value;
+            document.getElementById("valores-historicos").style.display = tipo ? "block" : "none";
+        }
+
         function calcularPronostico() {
-            document.getElementById("pronostico-msg").textContent = "Pronóstico de demanda calculado (ejemplo).";
+            const historial = document.getElementById("historial").value.split(",").map(Number);
+            if (historial.length < 2 || historial.includes(NaN)) {
+                document.getElementById("pronostico-msg").textContent = "Por favor, ingrese al menos dos valores numéricos válidos.";
+                return;
+            }
+
+            // Implementación de regresión lineal simple
+            const n = historial.length;
+            const x = Array.from({length: n}, (_, i) => i + 1);
+            const sumX = x.reduce((a, b) => a + b, 0);
+            const sumY = historial.reduce((a, b) => a + b, 0);
+            const sumXY = x.reduce((sum, xi, i) => sum + xi * historial[i], 0);
+            const sumX2 = x.reduce((sum, xi) => sum + xi * xi, 0);
+            
+            const slope = (n * sumXY - sumX * sumY) / (n * sumX2 - sumX * sumX);
+            const intercept = (sumY - slope * sumX) / n;
+
+            const pronostico = slope * (n + 1) + intercept;
+            document.getElementById("pronostico-msg").textContent = `Pronóstico para el próximo período: ${pronostico.toFixed(2)}`;
         }
 
         function generarResumen() {
