@@ -29,7 +29,8 @@
 
         input[type="text"],
         input[type="password"],
-        input[type="number"] {
+        input[type="number"],
+        input[type="text"] {
             width: 100%;
             padding: 8px;
             margin: 5px 0 15px 0;
@@ -147,6 +148,23 @@
             <p id="transaccion-msg"></p>
         </div>
 
+        <!-- Sección de pronóstico de demanda -->
+        <div id="pronostico-section" style="display: none;">
+            <h2>Pronóstico de Demanda</h2>
+            <label for="intervalo">Selecciona el intervalo de tiempo:</label>
+            <select id="intervalo">
+                <option value="dia">Diario</option>
+                <option value="mes">Mensual</option>
+                <option value="año">Anual</option>
+            </select><br><br>
+            
+            <label for="datos-demanda">Ingresa los datos históricos separados por comas:</label>
+            <input type="text" id="datos-demanda" placeholder="Ejemplo: 20, 30, 25, 40"><br>
+            
+            <button onclick="calcularPronostico()">Calcular Pronóstico</button>
+            <p id="pronostico-msg"></p>
+        </div>
+
         <!-- Sección para el resumen diario -->
         <div id="resumen-section" style="display: none;">
             <h2>Resumen Diario</h2>
@@ -192,7 +210,7 @@
                     inventario[producto] += cantidad;
                 } else {
                     inventario[producto] = cantidad;
-                    ventasDiarias[producto] = 0; // Inicializa las ventas en cero para el producto
+                    ventasDiarias[producto] = 0;
                 }
                 document.getElementById("stock-msg").textContent = "Stock actualizado.";
                 document.getElementById("producto").value = "";
@@ -223,42 +241,64 @@
             const valor = parseFloat(document.getElementById("valor").value);
             const cantidadVendida = parseInt(document.getElementById("cantidad-vendida").value);
 
-            if (inventario[referencia] && inventario[referencia] >= cantidadVendida) {
+            if (inventario[referencia] && cantidadVendida <= inventario[referencia]) {
                 inventario[referencia] -= cantidadVendida;
                 ventasDiarias[referencia] += cantidadVendida;
-                document.getElementById("transaccion-msg").textContent = "Transacción registrada y stock actualizado.";
+                document.getElementById("transaccion-msg").textContent = "Transacción agregada exitosamente.";
                 document.getElementById("referencia").value = "";
                 document.getElementById("valor").value = "";
                 document.getElementById("cantidad-vendida").value = "";
                 actualizarListaProductos();
             } else {
-                document.getElementById("transaccion-msg").textContent = "Stock insuficiente o producto no encontrado.";
+                document.getElementById("transaccion-msg").textContent = "Producto no disponible o cantidad excede el stock.";
             }
         }
 
         function generarResumen() {
-            let totalVentas = 0;
-            let totalProductos = 0;
             let totalCantidadVendida = 0;
-
-            // Generar resumen por producto
-            let resumenProductos = "Resumen de productos vendidos y existencias:\n";
+            let totalProductos = 0;
+            let totalVentas = 0;
+            let resumenProductos = "Productos vendidos y existencias:\n";
             for (let producto in inventario) {
                 const cantidadVendida = ventasDiarias[producto];
                 resumenProductos += `Producto: ${producto}, Vendido: ${cantidadVendida} unidades, Existencias: ${inventario[producto]} unidades\n`;
                 totalCantidadVendida += cantidadVendida;
                 totalProductos += inventario[producto];
-                totalVentas += cantidadVendida * 10;  // Valor ficticio para ejemplo
+                totalVentas += cantidadVendida * 10;
             }
 
-            // Calcular el promedio de ventas
             const promedioVentas = totalCantidadVendida > 0 ? (totalVentas / totalCantidadVendida).toFixed(2) : 0;
 
-            // Mostrar el resumen en pantalla
             document.getElementById("resumen-total").textContent = `Total de productos en stock: ${totalProductos}`;
             document.getElementById("resumen-productos").textContent = resumenProductos;
             document.getElementById("resumen-promedio").textContent = `Promedio de ventas: $${promedioVentas}`;
             document.getElementById("resumen-section").style.display = "block";
+        }
+
+        function mostrarPronostico() {
+            document.getElementById("pronostico-section").style.display = "block";
+        }
+
+        function calcularPronostico() {
+            const intervalo = document.getElementById("intervalo").value;
+            const datosDemanda = document.getElementById("datos-demanda").value.split(",").map(Number);
+
+            if (datosDemanda.length < 2) {
+                document.getElementById("pronostico-msg").textContent = "Por favor ingresa al menos dos datos para calcular el pronóstico.";
+                return;
+            }
+
+            const n = datosDemanda.length;
+            const sumX = datosDemanda.reduce((acc, _, i) => acc + i, 0);
+            const sumY = datosDemanda.reduce((acc, y) => acc + y, 0);
+            const sumXY = datosDemanda.reduce((acc, y, i) => acc + i * y, 0);
+            const sumX2 = datosDemanda.reduce((acc, _, i) => acc + i * i, 0);
+
+            const slope = (n * sumXY - sumX * sumY) / (n * sumX2 - sumX * sumX);
+            const intercept = (sumY - slope * sumX) / n;
+
+            const pronostico = slope * n + intercept;
+            document.getElementById("pronostico-msg").textContent = `Pronóstico para el próximo ${intervalo}: ${pronostico.toFixed(2)} unidades.`;
         }
     </script>
 </body>
