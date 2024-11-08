@@ -4,13 +4,93 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sistema Contable Simple</title>
-    <link rel="stylesheet" href="styles.css">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/brain.js/2.0.0/brain.min.js"></script>
+    <style>
+        /* Estilos generales */
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f9;
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        h1, h2 {
+            color: #333;
+        }
+
+        label {
+            font-weight: bold;
+        }
+
+        input[type="text"],
+        input[type="password"],
+        input[type="number"] {
+            width: 100%;
+            padding: 8px;
+            margin: 5px 0 15px 0;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+
+        button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 20px;
+            margin: 10px 0;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        button:hover {
+            background-color: #45a049;
+        }
+
+        p {
+            margin: 0 0 10px;
+        }
+
+        /* Estilos de cada sección */
+        #login-section, #control-stock-section, #transaccion-section, #pronostico-section, #resumen-section {
+            border: 1px solid #ddd;
+            padding: 20px;
+            border-radius: 5px;
+            background-color: #fff;
+            box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+        }
+
+        #stock-list {
+            margin-top: 20px;
+            font-size: 14px;
+            color: #333;
+        }
+
+        #error-msg, #stock-msg, #transaccion-msg, #pronostico-msg {
+            font-weight: bold;
+        }
+
+        #error-msg {
+            color: red;
+        }
+
+        #stock-msg, #transaccion-msg, #pronostico-msg {
+            color: #4CAF50;
+        }
+    </style>
 </head>
 <body>
     <div class="container">
         <h1>Sistema Contable Simple</h1>
-
+        
+        <!-- Sección de inicio de sesión -->
         <div id="login-section">
             <h2>Iniciar Sesión</h2>
             <label for="usuario">Usuario:</label>
@@ -22,7 +102,8 @@
             <button onclick="iniciarSesion()">Iniciar Sesión</button>
             <p id="error-msg"></p>
         </div>
-
+        
+        <!-- Sección de acciones -->
         <div id="acciones-section" style="display: none;">
             <button onclick="mostrarAgregarTransaccion()">Agregar Transacción</button>
             <button onclick="generarResumen()">Generar Resumen Diario</button>
@@ -31,6 +112,7 @@
             <button onclick="cerrarSesion()">Salir</button>
         </div>
 
+        <!-- Sección de control de stock -->
         <div id="control-stock-section" style="display: none;">
             <h2>Control de Stock</h2>
             <label for="producto">Producto:</label>
@@ -42,12 +124,14 @@
             <button onclick="actualizarStock()">Actualizar Stock</button>
             <p id="stock-msg"></p>
             
-            <div id="product-list">
-                <h3>Lista de Productos</h3>
-                <div id="stock-list"></div>
+            <!-- Lista de productos en inventario -->
+            <div id="stock-list">
+                <h2>Inventario de Productos</h2>
+                <ul id="lista-productos"></ul>
             </div>
         </div>
 
+        <!-- Sección para agregar transacción -->
         <div id="transaccion-section" style="display: none;">
             <h2>Agregar Transacción</h2>
             <label for="referencia">Referencia del Producto:</label>
@@ -56,20 +140,21 @@
             <label for="valor">Valor de Compra:</label>
             <input type="number" id="valor" placeholder="Ingresa el valor"><br>
             
+            <label for="cantidad-vendida">Cantidad Vendida:</label>
+            <input type="number" id="cantidad-vendida" placeholder="Cantidad vendida"><br>
+            
             <button onclick="agregarTransaccion()">Agregar</button>
             <p id="transaccion-msg"></p>
         </div>
 
+        <!-- Sección de pronóstico de demanda -->
         <div id="pronostico-section" style="display: none;">
             <h2>Pronóstico de Demanda</h2>
-            <label for="demandaPasada">Demanda Pasada:</label>
-            <input type="number" id="demandaPasada" placeholder="Ingrese la demanda pasada"><br>
-            
-            <button onclick="entrenarModelo()">Entrenar Modelo</button>
             <button onclick="calcularPronostico()">Calcular Pronóstico</button>
             <p id="pronostico-msg"></p>
         </div>
 
+        <!-- Sección para el resumen diario -->
         <div id="resumen-section" style="display: none;">
             <h2>Resumen Diario</h2>
             <p id="resumen-total"></p>
@@ -77,6 +162,105 @@
         </div>
     </div>
 
-    <script src="app.js"></script>
+    <script>
+        // Variables para almacenar el estado de sesión y stock
+        let sesionIniciada = false;
+        let inventario = {};
+
+        function iniciarSesion() {
+            const usuario = document.getElementById("usuario").value;
+            const contraseña = document.getElementById("contraseña").value;
+            if (usuario === "admin" && contraseña === "1234") {
+                sesionIniciada = true;
+                document.getElementById("login-section").style.display = "none";
+                document.getElementById("acciones-section").style.display = "block";
+            } else {
+                document.getElementById("error-msg").textContent = "Usuario o contraseña incorrectos.";
+            }
+        }
+
+        function cerrarSesion() {
+            sesionIniciada = false;
+            document.getElementById("login-section").style.display = "block";
+            document.getElementById("acciones-section").style.display = "none";
+        }
+
+        function mostrarControlStock() {
+            document.getElementById("control-stock-section").style.display = "block";
+        }
+
+        function actualizarStock() {
+            const producto = document.getElementById("producto").value;
+            const cantidad = parseInt(document.getElementById("cantidad").value);
+
+            if (producto && cantidad > 0) {
+                if (inventario[producto]) {
+                    inventario[producto] += cantidad;
+                } else {
+                    inventario[producto] = cantidad;
+                }
+                document.getElementById("stock-msg").textContent = "Stock actualizado.";
+                document.getElementById("producto").value = "";
+                document.getElementById("cantidad").value = "";
+                actualizarListaProductos();
+            } else {
+                document.getElementById("stock-msg").textContent = "Por favor ingresa un producto y una cantidad válida.";
+            }
+        }
+
+        function actualizarListaProductos() {
+            const listaProductos = document.getElementById("lista-productos");
+            listaProductos.innerHTML = "";
+
+            for (let producto in inventario) {
+                const item = document.createElement("li");
+                item.textContent = `${producto}: ${inventario[producto]} unidades`;
+                listaProductos.appendChild(item);
+            }
+        }
+
+        function mostrarAgregarTransaccion() {
+            document.getElementById("transaccion-section").style.display = "block";
+        }
+
+        function agregarTransaccion() {
+            const referencia = document.getElementById("referencia").value;
+            const valor = parseFloat(document.getElementById("valor").value);
+            const cantidadVendida = parseInt(document.getElementById("cantidad-vendida").value);
+
+            if (referencia in inventario && cantidadVendida <= inventario[referencia]) {
+                inventario[referencia] -= cantidadVendida;
+                document.getElementById("transaccion-msg").textContent = "Transacción añadida correctamente.";
+                document.getElementById("referencia").value = "";
+                document.getElementById("valor").value = "";
+                document.getElementById("cantidad-vendida").value = "";
+                actualizarListaProductos();
+            } else {
+                document.getElementById("transaccion-msg").textContent = "Producto no encontrado o cantidad insuficiente en stock.";
+            }
+        }
+
+        function mostrarPronostico() {
+            document.getElementById("pronostico-section").style.display = "block";
+        }
+
+        function calcularPronostico() {
+            document.getElementById("pronostico-msg").textContent = "Pronóstico de demanda calculado (ejemplo).";
+        }
+
+        function generarResumen() {
+            let totalVentas = 0;
+            let totalProductos = 0;
+
+            for (let producto in inventario) {
+                totalProductos += inventario[producto];
+                totalVentas += inventario[producto] * 10;  // Valor ficticio para ejemplo
+            }
+
+            document.getElementById("resumen-total").textContent = `Total de productos en stock: ${totalProductos}`;
+            document.getElementById("resumen-promedio").textContent = `Valor promedio por producto: $${(totalVentas / totalProductos).toFixed(2)}`;
+            document.getElementById("resumen-section").style.display = "block";
+        }
+    </script>
 </body>
 </html>
