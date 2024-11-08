@@ -5,6 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sistema Contable Simple</title>
     <link rel="stylesheet" href="styles.css">
+    <!-- Incluir la librería brain.js para la red neuronal -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/brain.js/2.0.0/brain.min.js"></script>
 </head>
 <body>
     <div class="container">
@@ -27,12 +29,14 @@
         <div id="acciones-section" style="display: none;">
             <button onclick="mostrarAgregarTransaccion()">Agregar Transacción</button>
             <button onclick="generarResumen()">Generar Resumen Diario</button>
+            <button onclick="mostrarControlStock()">Control de Stock</button> <!-- Nuevo botón -->
+            <button onclick="mostrarPronostico()">Pronóstico de Demanda</button> <!-- Nuevo botón -->
             <button onclick="cerrarSesion()">Salir</button>
         </div>
 
-        <!-- Sección para agregar stock de producto -->
-        <div id="stock-section">
-            <h2>Actualizar Inventario</h2>
+        <!-- Sección de control de stock (ahora oculta) -->
+        <div id="control-stock-section" style="display: none;">
+            <h2>Control de Stock</h2>
             <label for="producto">Producto:</label>
             <input type="text" id="producto" placeholder="Nombre del producto"><br>
             
@@ -61,6 +65,13 @@
             <p id="transaccion-msg"></p>
         </div>
 
+        <!-- Sección de pronóstico de demanda -->
+        <div id="pronostico-section" style="display: none;">
+            <h2>Pronóstico de Demanda</h2>
+            <button onclick="calcularPronostico()">Calcular Pronóstico</button>
+            <p id="pronostico-msg"></p>
+        </div>
+
         <!-- Sección para el resumen diario -->
         <div id="resumen-section" style="display: none;">
             <h2>Resumen Diario</h2>
@@ -73,3 +84,4 @@
     <script src="app.js"></script>
 </body>
 </html>
+
