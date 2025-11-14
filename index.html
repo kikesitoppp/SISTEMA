@@ -1013,6 +1013,54 @@
     </div>
 </div>
 
+<div class="ia-form">
+    <h3><i class="fas fa-search"></i> Generador de Rutas Inteligentes</h3>
+    <div class="input-group">
+        <input type="text" id="producto-input" placeholder="Ingresa un producto (ej. café, banano, cacao)">
+        <button onclick="analizarRuta()">
+            <i class="fas fa-brain"></i> Analizar Ruta
+        </button>
+    </div>
+</div>
+
+<div class="results-container" id="ia-results" style="margin-top:25px">
+    <h4><i class="fas fa-route"></i> Resultados del Análisis</h4>
+
+    <div class="result-item">
+        <span class="info-label">Producto:</span>
+        <span class="info-value" id="resultado-producto">-</span>
+    </div>
+
+    <div class="result-item">
+        <span class="info-label">Ruta Completa:</span>
+        <span class="info-value" id="resultado-ruta">-</span>
+    </div>
+
+    <div class="result-item">
+        <span class="info-label">Transporte Recomendado:</span>
+        <span class="info-value" id="resultado-transporte">-</span>
+    </div>
+
+    <div class="result-item">
+        <span class="info-label">Tiempo Estimado:</span>
+        <span class="info-value" id="resultado-tiempo">-</span>
+    </div>
+
+    <div class="result-item">
+        <span class="info-label">Distancia Total:</span>
+        <span class="info-value" id="resultado-distancia">-</span>
+    </div>
+
+    <div class="result-item">
+        <span class="info-label">Emisiones CO₂:</span>
+        <span class="info-value" id="resultado-co2">-</span>
+    </div>
+
+    <div class="result-item">
+        <span class="info-label">Nodos Intermedios:</span>
+        <span class="info-value" id="resultado-nodos">-</span>
+    </div>
+</div>
 
 
             <!-- Quality Banner -->
