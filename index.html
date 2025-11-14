@@ -555,136 +555,7 @@
             background-clip: text;
         }
 
-        .simulation-visual {
-            height: 400px;
-            background: linear-gradient(45deg, #1e293b, #0f172a);
-            border-radius: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            position: relative;
-            overflow: hidden;
-            margin-bottom: 30px;
-        }
 
-        .flow-stages {
-            display: flex;
-            justify-content: space-around;
-            width: 100%;
-            position: relative;
-        }
-
-        .stage {
-            text-align: center;
-            z-index: 2;
-        }
-
-        .stage-icon {
-            width: 80px;
-            height: 80px;
-            background: linear-gradient(135deg, #3b82f6, #1d4ed8);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 2rem;
-            margin: 0 auto 15px;
-            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
-        }
-
-        .stage-label {
-            color: #f1f5f9;
-            font-weight: 600;
-        }
-
-        .flow-arrows {
-            position: absolute;
-            top: 40px;
-            left: 0;
-            width: 100%;
-            display: flex;
-            justify-content: space-around;
-        }
-
-        .arrow {
-            width: 80px;
-            height: 4px;
-            background: linear-gradient(90deg, #3b82f6, #10b981);
-            margin: 0 10px;
-            position: relative;
-        }
-
-        .arrow::after {
-            content: '';
-            position: absolute;
-            right: -10px;
-            top: -5px;
-            width: 0;
-            height: 0;
-            border-left: 10px solid #10b981;
-            border-top: 10px solid transparent;
-            border-bottom: 10px solid transparent;
-        }
-
-        .kpi-container {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 20px;
-        }
-
-        .kpi-card {
-            background: rgba(15, 23, 42, 0.7);
-            border: 1px solid rgba(100, 116, 139, 0.3);
-            border-radius: 12px;
-            padding: 20px;
-            text-align: center;
-        }
-
-        .kpi-value {
-            font-size: 2rem;
-            font-weight: 700;
-            margin: 10px 0;
-            background: linear-gradient(45deg, #3b82f6, #10b981);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-
-        .kpi-label {
-            color: #94a3b8;
-            font-size: 0.9rem;
-        }
-
-        .info-panel {
-            background: rgba(15, 23, 42, 0.7);
-            border: 1px solid rgba(100, 116, 139, 0.3);
-            border-radius: 16px;
-            padding: 25px;
-            backdrop-filter: blur(10px);
-        }
-
-        .info-item {
-            margin-bottom: 20px;
-            padding-bottom: 15px;
-            border-bottom: 1px solid rgba(100, 116, 139, 0.2);
-        }
-
-        .info-item:last-child {
-            border-bottom: none;
-            margin-bottom: 0;
-        }
-
-        .info-label {
-            color: #94a3b8;
-            font-size: 0.9rem;
-            margin-bottom: 5px;
-        }
-
-        .info-value {
-            font-weight: 600;
-            color: #f1f5f9;
-            font-size: 1.1rem;
-        }
 
         /* Fase 4 Styles */
         .fase4-container {
@@ -1056,144 +927,32 @@
                     </div>
                 </div>
 
-                <!-- Fase 3 Section -->
-                <div class="content-section" id="fase3">
-                    <div class="fase3-container">
-                        <div class="simulation-area">
-                            <div class="simulation-header">
-                                <i class="fas fa-project-diagram"></i>
-                                <h2>Simulación del Flujo de Contenedores</h2>
-                            </div>
-                            
-                            <div class="simulation-visual">
-                                <div class="flow-stages">
-                                    <div class="stage">
-                                        <div class="stage-icon">
-                                            <i class="fas fa-truck-loading"></i>
-                                        </div>
-                                        <div class="stage-label">Ingreso</div>
-                                    </div>
-                                    <div class="stage">
-                                        <div class="stage-icon">
-                                            <i class="fas fa-search"></i>
-                                        </div>
-                                        <div class="stage-label">Inspección</div>
-                                    </div>
-                                    <div class="stage">
-                                        <div class="stage-icon">
-                                            <i class="fas fa-warehouse"></i>
-                                        </div>
-                                        <div class="stage-label">Almacenamiento</div>
-                                    </div>
-                                    <div class="stage">
-                                        <div class="stage-icon">
-                                            <i class="fas fa-ship"></i>
-                                        </div>
-                                        <div class="stage-label">Embarque</div>
-                                    </div>
-                                </div>
-                                <div class="flow-arrows">
-                                    <div class="arrow"></div>
-                                    <div class="arrow"></div>
-                                    <div class="arrow"></div>
-                                </div>
-                            </div>
+<!-- Fase 3 Section -->
+<div class="content-section" id="fase3">
+    <div class="fase3-container">
+        <div class="simulation-area">
+            <div class="simulation-header">
+                <i class="fas fa-project-diagram"></i>
+                <h2>Simulación del Flujo de Contenedores</h2>
+            </div>
 
-                            <div class="kpi-container">
-                                <div class="kpi-card">
-                                    <div class="kpi-value">42h</div>
-                                    <div class="kpi-label">Tiempo Promedio</div>
-                                </div>
-                                <div class="kpi-card">
-                                    <div class="kpi-value">94%</div>
-                                    <div class="kpi-label">Operaciones Conformes</div>
-                                </div>
-                                <div class="kpi-card">
-                                    <div class="kpi-value">2.8t</div>
-                                    <div class="kpi-label">CO₂ Estimado</div>
-                                </div>
-                                <div class="kpi-card">
-                                    <div class="kpi-value">96%</div>
-                                    <div class="kpi-label">Eficiencia</div>
-                                </div>
-                            </div>
-                        </div>
+            <!-- NUEVO CONTENEDOR DEL VIDEO -->
+            <div class="video-container" style="margin-top: 20px;">
+                <video controls style="width:100%; border-radius:12px;">
+                    <source src="video1.mp4" type="video/mp4">
+                    Tu navegador no soporta reproducción de video.
+                </video>
+            </div>
 
-                        <div class="info-panel">
-                            <h3><i class="fas fa-chart-bar"></i> Métricas de Desempeño</h3>
-                            <div class="info-item">
-                                <div class="info-label">Contenedores Procesados</div>
-                                <div class="info-value">1,247</div>
-                            </div>
-                            <div class="info-item">
-                                <div class="info-label">Tiempo Óptimo</div>
-                                <div class="info-value">36h</div>
-                            </div>
-                            <div class="info-item">
-                                <div class="info-label">Tasa de Éxito</div>
-                                <div class="info-value">97.2%</div>
-                            </div>
-                            <div class="info-item">
-                                <div class="info-label">Reducción CO₂</div>
-                                <div class="info-value">15%</div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+        </div>
 
-                <!-- Fase 4 Section -->
-                <div class="content-section" id="fase4">
-                    <div class="fase4-container">
-                        <div class="ia-header">
-                            <h2><i class="fas fa-robot"></i> Inteligencia Artificial Predictiva</h2>
-                            <p>Análisis inteligente de rutas logísticas y optimización de procesos</p>
-                        </div>
+        <!-- Eliminamos el panel derecho (info-panel) 
+             pero mantenemos un contenedor vacío
+             para que no se rompa el grid -->
+        <div></div>
 
-                        <div class="ia-form">
-                            <h3><i class="fas fa-search"></i> Generador de Rutas Inteligentes</h3>
-                            <div class="input-group">
-                                <input type="text" id="producto-input" placeholder="Ingresa un producto (ej. café, banano, cacao)">
-                                <button onclick="analizarRuta()">
-                                    <i class="fas fa-brain"></i> Analizar Ruta
-                                </button>
-                            </div>
-                        </div>
-
-                        <div class="results-container" id="ia-results">
-                            <h4><i class="fas fa-route"></i> Resultados del Análisis</h4>
-                            <div class="result-item">
-                                <span class="info-label">Producto:</span>
-                                <span class="info-value" id="resultado-producto">-</span>
-                            </div>
-                            <div class="result-item">
-                                <span class="info-label">Ruta Completa:</span>
-                                <span class="info-value" id="resultado-ruta">-</span>
-                            </div>
-                            <div class="result-item">
-                                <span class="info-label">Transporte Recomendado:</span>
-                                <span class="info-value" id="resultado-transporte">-</span>
-                            </div>
-                            <div class="result-item">
-                                <span class="info-label">Tiempo Estimado:</span>
-                                <span class="info-value" id="resultado-tiempo">-</span>
-                            </div>
-                            <div class="result-item">
-                                <span class="info-label">Distancia Total:</span>
-                                <span class="info-value" id="resultado-distancia">-</span>
-                            </div>
-                            <div class="result-item">
-                                <span class="info-label">Emisiones CO₂:</span>
-                                <span class="info-value" id="resultado-co2">-</span>
-                            </div>
-                            <div class="result-item">
-                                <span class="info-label">Nodos Intermedios:</span>
-                                <span class="info-value" id="resultado-nodos">-</span>
-                            </div>
-                            
-                            <button class="download-btn">
-                                <i class="fas fa-file-pdf"></i> Descargar Informe PDF
-                            </button>
-                        </div>
+    </div>
+</div>
 
                         <div class="ia-map">
                             <svg width="100%" height="100%" viewBox="0 0 600 300">
