@@ -3,303 +3,1933 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sistema Contable Simple con Pronóstico de Demanda</title>
+    <title>Visualización de rutas logísticas y operaciones portuarias mediante herramientas digitales con enfoque en calidad</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <link rel="stylesheet" href="https://unpkg.com/leaflet-routing-machine@3.2.12/dist/leaflet-routing-machine.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="https://unpkg.com/leaflet-routing-machine@3.2.12/dist/leaflet-routing-machine.js"></script>
     <style>
-        /* Estilos generales */
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f4f4f9;
+        * {
             margin: 0;
             padding: 0;
-        }
-
-        .container {
-            max-width: 800px;
-            margin: 0 auto;
-            padding: 20px;
-        }
-
-        h1, h2 {
-            color: #333;
-        }
-
-        label {
-            font-weight: bold;
-        }
-
-        input[type="text"],
-        input[type="password"],
-        input[type="number"],
-        input[type="text"] {
-            width: 100%;
-            padding: 8px;
-            margin: 5px 0 15px 0;
-            border: 1px solid #ddd;
-            border-radius: 4px;
             box-sizing: border-box;
         }
 
-        button {
-            background-color: #4CAF50;
-            color: white;
-            padding: 10px 20px;
-            margin: 10px 0;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 16px;
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+            color: #e2e8f0;
+            height: 100vh;
+            overflow: hidden;
         }
 
-        button:hover {
-            background-color: #45a049;
+        .app-container {
+            display: flex;
+            height: 100vh;
+            position: relative;
         }
 
-        p {
-            margin: 0 0 10px;
+        /* Sidebar Styles */
+        .sidebar {
+            width: 280px;
+            background: linear-gradient(180deg, #065f46 0%, #047857 100%);
+            padding: 20px 0;
+            z-index: 100;
+            overflow-y: auto;
+            box-shadow: 4px 0 20px rgba(0, 0, 0, 0.3);
+            transition: all 0.3s ease;
         }
 
-        /* Estilos de cada sección */
-        #login-section, #control-stock-section, #transaccion-section, #pronostico-section, #resumen-section {
-            border: 1px solid #ddd;
-            padding: 20px;
-            border-radius: 5px;
-            background-color: #fff;
-            box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.1);
+        .sidebar-header {
+            padding: 0 20px 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
             margin-bottom: 20px;
         }
 
-        #stock-list {
-            margin-top: 20px;
-            font-size: 14px;
-            color: #333;
+        .sidebar-header h1 {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: white;
+            line-height: 1.4;
         }
 
-        #error-msg, #stock-msg, #transaccion-msg, #pronostico-msg {
+        .menu-item {
+            display: flex;
+            align-items: center;
+            padding: 15px 20px;
+            margin: 5px 15px;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            color: rgba(255, 255, 255, 0.9);
+        }
+
+        .menu-item:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .menu-item.active {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+        }
+
+        .menu-item i {
+            width: 24px;
+            margin-right: 12px;
+            font-size: 1.1rem;
+        }
+
+        .menu-item span {
+            font-size: 0.95rem;
+            font-weight: 500;
+        }
+
+        /* Mobile Menu */
+        .mobile-menu-btn {
+            display: none;
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            background: linear-gradient(180deg, #065f46, #047857);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            padding: 12px 15px;
+            font-size: 1.2rem;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+            z-index: 1000;
+        }
+
+        /* Main Content Styles */
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+        }
+
+        .content-area {
+            flex: 1;
+            padding: 30px;
+            overflow-y: auto;
+            position: relative;
+        }
+
+        .content-section {
+            display: none;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .content-section.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Quality Banner */
+        .quality-banner {
+            background: linear-gradient(90deg, #065f46, #047857);
+            padding: 15px;
+            text-align: center;
+            font-size: 0.9rem;
+            font-weight: 500;
+            color: white;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        /* Portada Styles */
+        .portada {
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 20px;
+            background: 
+                linear-gradient(rgba(15, 23, 42, 0.85), rgba(15, 23, 42, 0.85)),
+                url('https://a0.cdnfan.com/images/M/6/4/4/2/ruta-en-barco-coche-chino-2_hd_159723.jpg');
+            background-size: cover;
+            background-position: center;
+        }
+
+        .portada h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 20px;
+            background: linear-gradient(45deg, #3b82f6, #10b981, #f59e0b);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            line-height: 1.3;
+            max-width: 1000px;
+        }
+
+        .portada p {
+            font-size: 1.2rem;
+            color: #cbd5e1;
+            margin-bottom: 40px;
+            max-width: 800px;
+            line-height: 1.6;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+        }
+
+        /* Fase 1 Styles */
+        .fase1-container {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 30px;
+            height: 100%;
+        }
+
+        .fase1-content {
+            background: rgba(30, 41, 59, 0.7);
+            border: 1px solid rgba(100, 116, 139, 0.3);
+            border-radius: 16px;
+            padding: 30px;
+            backdrop-filter: blur(10px);
+        }
+
+        .fase1-content h2 {
+            font-size: 2rem;
+            margin-bottom: 25px;
+            color: #f1f5f9;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .fase1-content h2 i {
+            background: linear-gradient(45deg, #3b82f6, #10b981);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .fase1-content p {
+            font-size: 1.1rem;
+            line-height: 1.7;
+            color: #cbd5e1;
+            margin-bottom: 20px;
+        }
+
+        .cards-container {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .card {
+            background: rgba(15, 23, 42, 0.7);
+            border: 1px solid rgba(100, 116, 139, 0.3);
+            border-radius: 12px;
+            padding: 25px;
+            transition: all 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            border-color: rgba(59, 130, 246, 0.5);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.3);
+        }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .card-icon {
+            font-size: 2rem;
+            background: linear-gradient(45deg, #3b82f6, #10b981);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .card-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: #f1f5f9;
+        }
+
+        .card-content {
+            color: #94a3b8;
+            line-height: 1.6;
+            margin-bottom: 20px;
+        }
+
+        .card-button {
+            background: linear-gradient(45deg, #065f46, #047857);
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 8px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .card-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        /* Video Container */
+        .video-container {
+            position: relative;
+            padding-bottom: 56.25%;
+            height: 0;
+            border-radius: 12px;
+            overflow: hidden;
+            margin: 30px 0;
+            background: #000;
+        }
+
+        .video-container iframe {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+
+        /* Quiz Styles */
+        .quiz-container {
+            background: rgba(15, 23, 42, 0.7);
+            border: 1px solid rgba(100, 116, 139, 0.3);
+            border-radius: 16px;
+            padding: 30px;
+            margin-top: 30px;
+        }
+
+        .question {
+            margin-bottom: 25px;
+        }
+
+        .question h4 {
+            margin-bottom: 15px;
+            color: #f1f5f9;
+            font-size: 1.1rem;
+        }
+
+        .options {
+            display: grid;
+            gap: 12px;
+        }
+
+        .option {
+            padding: 15px 20px;
+            background: rgba(30, 41, 59, 0.5);
+            border: 1px solid rgba(100, 116, 139, 0.3);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            color: #cbd5e1;
+        }
+
+        .option:hover {
+            background: rgba(59, 130, 246, 0.2);
+            border-color: rgba(59, 130, 246, 0.5);
+        }
+
+        /* Fase 2 Styles - Mapa Interactivo */
+        .fase2-full-container {
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .fase2-header {
+            background: rgba(30, 41, 59, 0.7);
+            border: 1px solid rgba(100, 116, 139, 0.3);
+            border-radius: 16px;
+            padding: 20px 30px;
+            margin-bottom: 20px;
+            backdrop-filter: blur(10px);
+        }
+
+        .fase2-header h2 {
+            font-size: 2rem;
+            color: #f1f5f9;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 10px;
+        }
+
+        .fase2-header h2 i {
+            background: linear-gradient(45deg, #3b82f6, #10b981);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .fase2-header p {
+            color: #cbd5e1;
+            font-size: 1.1rem;
+        }
+
+        .fase2-container {
+            display: grid;
+            grid-template-columns: 350px 1fr;
+            gap: 20px;
+            flex: 1;
+            min-height: 0;
+        }
+
+        .product-sidebar {
+            background: rgba(30, 41, 59, 0.7);
+            border: 1px solid rgba(100, 116, 139, 0.3);
+            border-radius: 16px;
+            padding: 25px;
+            backdrop-filter: blur(10px);
+            overflow-y: auto;
+        }
+
+        .product-sidebar h3 {
+            font-size: 1.5rem;
+            margin-bottom: 20px;
+            color: #f1f5f9;
+        }
+
+        .product-btn {
+            width: 100%;
+            padding: 15px;
+            margin-bottom: 10px;
+            border: none;
+            border-radius: 10px;
+            background: rgba(15, 23, 42, 0.7);
+            border: 1px solid rgba(100, 116, 139, 0.3);
+            cursor: pointer;
+            transition: all 0.3s;
+            text-align: left;
+            color: #cbd5e1;
+        }
+
+        .product-btn:hover {
+            background: rgba(59, 130, 246, 0.2);
+            border-color: rgba(59, 130, 246, 0.5);
+            transform: translateX(5px);
+        }
+
+        .product-btn.active {
+            background: linear-gradient(135deg, #3b82f6, #10b981);
+            color: white;
+            border-color: transparent;
+        }
+
+        .product-name {
             font-weight: bold;
+            font-size: 1.1em;
+            margin-bottom: 5px;
         }
 
-        #error-msg {
-            color: red;
+        .product-origin {
+            font-size: 0.9em;
+            opacity: 0.8;
         }
 
-        #stock-msg, #transaccion-msg, #pronostico-msg {
-            color: #4CAF50;
+        .map-area {
+            background: rgba(30, 41, 59, 0.7);
+            border: 1px solid rgba(100, 116, 139, 0.3);
+            border-radius: 16px;
+            padding: 20px;
+            backdrop-filter: blur(10px);
+            display: flex;
+            flex-direction: column;
+        }
+
+        #map {
+            flex: 1;
+            border-radius: 12px;
+            min-height: 400px;
+        }
+
+        .route-info {
+            background: rgba(15, 23, 42, 0.7);
+            border: 1px solid rgba(100, 116, 139, 0.3);
+            border-radius: 12px;
+            padding: 20px;
+            margin-top: 15px;
+            display: none;
+        }
+
+        .route-info.active {
+            display: block;
+        }
+
+        .route-info h4 {
+            font-size: 1.2rem;
+            margin-bottom: 15px;
+            color: #f1f5f9;
+        }
+
+        .route-step {
+            display: flex;
+            align-items: flex-start;
+            gap: 15px;
+            padding: 15px;
+            margin-bottom: 15px;
+            border-radius: 10px;
+            background: rgba(30, 41, 59, 0.5);
+        }
+
+        .route-step.road {
+            background: rgba(59, 130, 246, 0.2);
+            border-left: 4px solid #3b82f6;
+        }
+
+        .route-step.sea {
+            background: rgba(239, 68, 68, 0.2);
+            border-left: 4px solid #ef4444;
+        }
+
+        .route-step.destination {
+            background: rgba(16, 185, 129, 0.2);
+            border-left: 4px solid #10b981;
+        }
+
+        .step-content {
+            flex: 1;
+        }
+
+        .step-title {
+            font-weight: bold;
+            font-size: 1.1em;
+            margin-bottom: 5px;
+            color: #f1f5f9;
+        }
+
+        .step-location {
+            color: #cbd5e1;
+            margin-bottom: 5px;
+        }
+
+        .step-distance {
+            font-size: 0.9em;
+            color: #94a3b8;
+        }
+
+        .leaflet-routing-container {
+            display: none;
+        }
+
+        /* Fase 3 Styles */
+        .fase3-container {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 30px;
+            height: 100%;
+        }
+
+        .simulation-area {
+            background: rgba(30, 41, 59, 0.7);
+            border: 1px solid rgba(100, 116, 139, 0.3);
+            border-radius: 16px;
+            padding: 30px;
+            backdrop-filter: blur(10px);
+        }
+
+        .simulation-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+
+        .simulation-header i {
+            font-size: 2rem;
+            background: linear-gradient(45deg, #3b82f6, #10b981);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .simulation-visual {
+            height: 400px;
+            background: linear-gradient(45deg, #1e293b, #0f172a);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+            margin-bottom: 30px;
+        }
+
+        .flow-stages {
+            display: flex;
+            justify-content: space-around;
+            width: 100%;
+            position: relative;
+        }
+
+        .stage {
+            text-align: center;
+            z-index: 2;
+        }
+
+        .stage-icon {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            margin: 0 auto 15px;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .stage-label {
+            color: #f1f5f9;
+            font-weight: 600;
+        }
+
+        .flow-arrows {
+            position: absolute;
+            top: 40px;
+            left: 0;
+            width: 100%;
+            display: flex;
+            justify-content: space-around;
+        }
+
+        .arrow {
+            width: 80px;
+            height: 4px;
+            background: linear-gradient(90deg, #3b82f6, #10b981);
+            margin: 0 10px;
+            position: relative;
+        }
+
+        .arrow::after {
+            content: '';
+            position: absolute;
+            right: -10px;
+            top: -5px;
+            width: 0;
+            height: 0;
+            border-left: 10px solid #10b981;
+            border-top: 10px solid transparent;
+            border-bottom: 10px solid transparent;
+        }
+
+        .kpi-container {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+        }
+
+        .kpi-card {
+            background: rgba(15, 23, 42, 0.7);
+            border: 1px solid rgba(100, 116, 139, 0.3);
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .kpi-value {
+            font-size: 2rem;
+            font-weight: 700;
+            margin: 10px 0;
+            background: linear-gradient(45deg, #3b82f6, #10b981);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .kpi-label {
+            color: #94a3b8;
+            font-size: 0.9rem;
+        }
+
+        .info-panel {
+            background: rgba(15, 23, 42, 0.7);
+            border: 1px solid rgba(100, 116, 139, 0.3);
+            border-radius: 16px;
+            padding: 25px;
+            backdrop-filter: blur(10px);
+        }
+
+        .info-item {
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid rgba(100, 116, 139, 0.2);
+        }
+
+        .info-item:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+        }
+
+        .info-label {
+            color: #94a3b8;
+            font-size: 0.9rem;
+            margin-bottom: 5px;
+        }
+
+        .info-value {
+            font-weight: 600;
+            color: #f1f5f9;
+            font-size: 1.1rem;
+        }
+
+        /* Fase 4 Styles */
+        .fase4-container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .ia-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .ia-header h2 {
+            font-size: 2rem;
+            margin-bottom: 15px;
+            color: #f1f5f9;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+        }
+
+        .ia-header h2 i {
+            background: linear-gradient(45deg, #3b82f6, #10b981);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .ia-form {
+            background: rgba(30, 41, 59, 0.7);
+            border: 1px solid rgba(100, 116, 139, 0.3);
+            border-radius: 16px;
+            padding: 30px;
+            margin-bottom: 30px;
+            backdrop-filter: blur(10px);
+        }
+
+        .input-group {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .input-group input {
+            flex: 1;
+            padding: 15px 20px;
+            background: rgba(15, 23, 42, 0.5);
+            border: 1px solid rgba(100, 116, 139, 0.3);
+            border-radius: 12px;
+            color: #f1f5f9;
+            font-size: 1rem;
+        }
+
+        .input-group input::placeholder {
+            color: #94a3b8;
+        }
+
+        .input-group button {
+            padding: 15px 30px;
+            background: linear-gradient(45deg, #3b82f6, #10b981);
+            border: none;
+            border-radius: 12px;
+            color: white;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .input-group button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .results-container {
+            background: rgba(15, 23, 42, 0.7);
+            border: 1px solid rgba(100, 116, 139, 0.3);
+            border-radius: 16px;
+            padding: 25px;
+            margin-top: 25px;
+            display: none;
+        }
+
+        .result-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 15px 0;
+            border-bottom: 1px solid rgba(100, 116, 139, 0.2);
+        }
+
+        .result-item:last-child {
+            border-bottom: none;
+        }
+
+        .download-btn {
+            display: inline-block;
+            padding: 12px 25px;
+            background: linear-gradient(45deg, #f59e0b, #ef4444);
+            border: none;
+            border-radius: 8px;
+            color: white;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 20px;
+        }
+
+        .download-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        }
+
+        .ia-map {
+            height: 300px;
+            background: linear-gradient(45deg, #1e293b, #0f172a);
+            border-radius: 16px;
+            margin: 30px 0;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 1024px) {
+            .fase1-container,
+            .fase2-container,
+            .fase3-container {
+                grid-template-columns: 1fr;
+            }
+
+            .cards-container {
+                flex-direction: row;
+                flex-wrap: wrap;
+            }
+
+            .card {
+                flex: 1;
+                min-width: 250px;
+            }
+
+            .kpi-container {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                position: fixed;
+                left: -280px;
+                height: 100vh;
+                z-index: 1000;
+            }
+
+            .sidebar.active {
+                left: 0;
+            }
+
+            .mobile-menu-btn {
+                display: block;
+            }
+
+            .portada h1 {
+                font-size: 1.8rem;
+            }
+
+            .portada p {
+                font-size: 1rem;
+            }
+
+            .input-group {
+                flex-direction: column;
+            }
+
+            .cards-container {
+                flex-direction: column;
+            }
+
+            .card {
+                min-width: 100%;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .content-area {
+                padding: 15px;
+            }
+
+            .simulation-visual {
+                height: 300px;
+            }
+
+            .flow-stages {
+                flex-direction: column;
+                gap: 30px;
+            }
+
+            .flow-arrows {
+                display: none;
+            }
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <h1>Sistema Contable Simple</h1>
-        
-        <!-- Sección de inicio de sesión -->
-        <div id="login-section">
-            <h2>Iniciar Sesión</h2>
-            <label for="usuario">Usuario:</label>
-            <input type="text" id="usuario" placeholder="Ingresa tu usuario"><br>
-            
-            <label for="contraseña">Contraseña:</label>
-            <input type="password" id="contraseña" placeholder="Ingresa tu contraseña"><br>
-            
-            <button onclick="iniciarSesion()">Iniciar Sesión</button>
-            <p id="error-msg"></p>
-        </div>
-        
-        <!-- Sección de acciones -->
-        <div id="acciones-section" style="display: none;">
-            <button onclick="mostrarAgregarTransaccion()">Agregar Transacción</button>
-            <button onclick="generarResumen()">Generar Resumen Diario</button>
-            <button onclick="mostrarControlStock()">Control de Stock</button>
-            <button onclick="mostrarPronostico()">Pronóstico de Demanda</button>
-            <button onclick="cerrarSesion()">Salir</button>
-        </div>
+    <!-- Mobile Menu Button -->
+    <button class="mobile-menu-btn" onclick="toggleSidebar()">
+        <i class="fas fa-bars"></i>
+    </button>
 
-        <!-- Sección de control de stock -->
-        <div id="control-stock-section" style="display: none;">
-            <h2>Control de Stock</h2>
-            <label for="producto">Producto:</label>
-            <input type="text" id="producto" placeholder="Nombre del producto"><br>
-            
-            <label for="cantidad">Cantidad:</label>
-            <input type="number" id="cantidad" placeholder="Cantidad en stock"><br>
-            
-            <button onclick="actualizarStock()">Actualizar Stock</button>
-            <p id="stock-msg"></p>
-            
-            <!-- Lista de productos en inventario -->
-            <div id="stock-list">
-                <h2>Inventario de Productos</h2>
-                <ul id="lista-productos"></ul>
+    <div class="app-container">
+        <!-- Sidebar -->
+        <div class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <h1>Visualización Logística Portuaria</h1>
+            </div>
+            <div class="menu-item active" data-section="portada">
+                <i class="fas fa-home"></i>
+                <span>Portada</span>
+            </div>
+            <div class="menu-item" data-section="fase1">
+                <i class="fas fa-clipboard-check"></i>
+                <span>Fase 1 - Conceptos y Normas</span>
+            </div>
+            <div class="menu-item" data-section="fase2">
+                <i class="fas fa-map-marked-alt"></i>
+                <span>Fase 2 - Mapa Interactivo</span>
+            </div>
+            <div class="menu-item" data-section="fase3">
+                <i class="fas fa-project-diagram"></i>
+                <span>Fase 3 - Simulación de Flujo</span>
+            </div>
+            <div class="menu-item" data-section="fase4">
+                <i class="fas fa-robot"></i>
+                <span>Fase 4 - IA Predictiva</span>
             </div>
         </div>
 
-        <!-- Sección para agregar transacción -->
-        <div id="transaccion-section" style="display: none;">
-            <h2>Agregar Transacción</h2>
-            <label for="referencia">Referencia del Producto:</label>
-            <input type="text" id="referencia" placeholder="Ingresa la referencia"><br>
-            
-            <label for="valor">Valor de Compra:</label>
-            <input type="number" id="valor" placeholder="Ingresa el valor"><br>
-            
-            <label for="cantidad-vendida">Cantidad Vendida:</label>
-            <input type="number" id="cantidad-vendida" placeholder="Cantidad vendida"><br>
-            
-            <button onclick="agregarTransaccion()">Agregar</button>
-            <p id="transaccion-msg"></p>
-        </div>
+        <!-- Main Content -->
+        <div class="main-content">
+            <div class="content-area">
+                <!-- Portada Section -->
+                <div class="content-section active" id="portada">
+                    <div class="portada">
+                        <h1>Visualización de rutas logísticas y operaciones portuarias mediante herramientas digitales con enfoque en calidad</h1>
+                        <p>Herramientas digitales para una logística portuaria eficiente, trazable y comprometida con la calidad.</p>
+                    </div>
+                </div>
 
-        <!-- Sección de pronóstico de demanda -->
-        <div id="pronostico-section" style="display: none;">
-            <h2>Pronóstico de Demanda</h2>
-            <label for="intervalo">Selecciona el intervalo de tiempo:</label>
-            <select id="intervalo">
-                <option value="dia">Diario</option>
-                <option value="mes">Mensual</option>
-                <option value="año">Anual</option>
-            </select><br><br>
-            
-            <label for="datos-demanda">Ingresa los datos históricos separados por comas:</label>
-            <input type="text" id="datos-demanda" placeholder="Ejemplo: 20, 30, 25, 40"><br>
-            
-            <button onclick="calcularPronostico()">Calcular Pronóstico</button>
-            <p id="pronostico-msg"></p>
-        </div>
+                <!-- Fase 1 Section -->
+                <div class="content-section" id="fase1">
+                    <div class="fase1-container">
+                        <div class="fase1-content">
+                            <h2><i class="fas fa-clipboard-check"></i> Fase 1 - Conceptos y Normas de Calidad</h2>
+                            
+                            <p>La logística portuaria es el conjunto de actividades que permiten la recepción, almacenamiento, manipulación y despacho eficiente de mercancías a través de instalaciones portuarias. Involucra coordinación entre múltiples actores como navieras, agentes aduanales, transportistas y autoridades portuarias.</p>
+                            
+                            <p>El control de calidad basado en normas ISO garantiza procesos estandarizados, mejora continua y satisfacción del cliente mediante la identificación y gestión sistemática de riesgos operativos.</p>
+                            
+                            <div class="video-container">
+                                <iframe src="https://www.youtube.com/embed/Cow8OJ3ZzDU" frameborder="0" allowfullscreen></iframe>
+                            </div>
+                            <p style="text-align: center; margin-top: 10px; color: #94a3b8;">Calidad en operaciones portuarias: del estándar a la práctica
+</p>
+                            
+                            <div class="quiz-container">
+                                <h3>Cuestionario Interactivo</h3>
+                                <div class="question">
+                                    <h4>1. ¿Cuál es el propósito principal de la norma ISO 9001 en logística portuaria?</h4>
+                                    <div class="options">
+                                        <div class="option">A) Reducir costos operativos</div>
+                                        <div class="option">B) Establecer un sistema de gestión de calidad</div>
+                                        <div class="option">C) Aumentar la velocidad de procesamiento</div>
+                                        <div class="option">D) Mejorar la seguridad laboral</div>
+                                    </div>
+                                </div>
+                                <div class="question">
+                                    <h4>2. ¿Qué proceso es fundamental para el control de calidad en puertos?</h4>
+                                    <div class="options">
+                                        <div class="option">A) Inspección de mercancías</div>
+                                        <div class="option">B) Marketing de servicios</div>
+                                        <div class="option">C) Desarrollo de software</div>
+                                        <div class="option">D) Capacitación administrativa</div>
+                                    </div>
+                                </div>
+                                <div class="question">
+                                    <h4>3. ¿Cuál norma ISO se enfoca en la gestión ambiental en operaciones portuarias?</h4>
+                                    <div class="options">
+                                        <div class="option">A) ISO 9001</div>
+                                        <div class="option">B) ISO 14001</div>
+                                        <div class="option">C) ISO 28000</div>
+                                        <div class="option">D) ISO 45001</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
 
-        <!-- Sección para el resumen diario -->
-        <div id="resumen-section" style="display: none;">
-            <h2>Resumen Diario</h2>
-            <p id="resumen-total"></p>
-            <p id="resumen-productos"></p>
-            <p id="resumen-promedio"></p>
+                        <div class="cards-container">
+                            <div class="card">
+                                <div class="card-header">
+                                    <div class="card-icon">
+                                        <i class="fas fa-ship"></i>
+                                    </div>
+                                    <div class="card-title">Puerto</div>
+                                </div>
+                                <div class="card-content">
+                                    <p>Vista previa de imágenes reales del Puerto de Guayaquil con grúas, contenedores y buques comerciales.</p>
+                                </div>
+                                <button class="card-button">
+                                    <i class="fas fa-file-pdf"></i>
+                                    Ver PDF / Imágenes
+                                </button>
+                            </div>
+
+                            <div class="card">
+                                <div class="card-header">
+                                    <div class="card-icon">
+                                        <i class="fas fa-certificate"></i>
+                                    </div>
+                                    <div class="card-title">Normas de Calidad</div>
+                                </div>
+                                <div class="card-content">
+                                    <p>ISO 9001 (Calidad), ISO 14001 (Ambiental), ISO 28000 (Seguridad), ISO 45001 (Salud Ocupacional).</p>
+                                </div>
+                                <button class="card-button">
+                                    <i class="fas fa-file-pdf"></i>
+                                    Ver PDF — Normas
+                                </button>
+                            </div>
+
+                            <div class="card">
+                                <div class="card-header">
+                                    <div class="card-icon">
+                                        <i class="fas fa-tools"></i>
+                                    </div>
+                                    <div class="card-title">Herramientas Digitales</div>
+                                </div>
+                                <div class="card-content">
+                                    <p>FlexSim (simulación), ArcGIS (mapas), herramientas de modelado y monitoreo en tiempo real.</p>
+                                </div>
+                                <button class="card-button">
+                                    <i class="fas fa-file-pdf"></i>
+                                    Ver PDF — Herramientas
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Fase 2 Section - Mapa Interactivo -->
+                <div class="content-section" id="fase2">
+                    <div class="fase2-full-container">
+                        <div class="fase2-header">
+                            <h2><i class="fas fa-map-marked-alt"></i> Rastreador de Rutas de Productos Ecuatorianos</h2>
+                            <p>Rutas marítimas 100% por océano</p>
+                        </div>
+
+                        <div class="fase2-container">
+                            <div class="product-sidebar">
+                                <h3>Productos de Exportación</h3>
+                                <div id="productList"></div>
+                            </div>
+
+                            <div class="map-area">
+                                <div id="map"></div>
+                                <div id="routeInfo" class="route-info">
+                                    <h4><i class="fas fa-route"></i> Detalles de la Ruta</h4>
+                                    <div id="routeSteps"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Fase 3 Section -->
+                <div class="content-section" id="fase3">
+                    <div class="fase3-container">
+                        <div class="simulation-area">
+                            <div class="simulation-header">
+                                <i class="fas fa-project-diagram"></i>
+                                <h2>Simulación del Flujo de Contenedores</h2>
+                            </div>
+                            
+                            <div class="simulation-visual">
+                                <div class="flow-stages">
+                                    <div class="stage">
+                                        <div class="stage-icon">
+                                            <i class="fas fa-truck-loading"></i>
+                                        </div>
+                                        <div class="stage-label">Ingreso</div>
+                                    </div>
+                                    <div class="stage">
+                                        <div class="stage-icon">
+                                            <i class="fas fa-search"></i>
+                                        </div>
+                                        <div class="stage-label">Inspección</div>
+                                    </div>
+                                    <div class="stage">
+                                        <div class="stage-icon">
+                                            <i class="fas fa-warehouse"></i>
+                                        </div>
+                                        <div class="stage-label">Almacenamiento</div>
+                                    </div>
+                                    <div class="stage">
+                                        <div class="stage-icon">
+                                            <i class="fas fa-ship"></i>
+                                        </div>
+                                        <div class="stage-label">Embarque</div>
+                                    </div>
+                                </div>
+                                <div class="flow-arrows">
+                                    <div class="arrow"></div>
+                                    <div class="arrow"></div>
+                                    <div class="arrow"></div>
+                                </div>
+                            </div>
+
+                            <div class="kpi-container">
+                                <div class="kpi-card">
+                                    <div class="kpi-value">42h</div>
+                                    <div class="kpi-label">Tiempo Promedio</div>
+                                </div>
+                                <div class="kpi-card">
+                                    <div class="kpi-value">94%</div>
+                                    <div class="kpi-label">Operaciones Conformes</div>
+                                </div>
+                                <div class="kpi-card">
+                                    <div class="kpi-value">2.8t</div>
+                                    <div class="kpi-label">CO₂ Estimado</div>
+                                </div>
+                                <div class="kpi-card">
+                                    <div class="kpi-value">96%</div>
+                                    <div class="kpi-label">Eficiencia</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="info-panel">
+                            <h3><i class="fas fa-chart-bar"></i> Métricas de Desempeño</h3>
+                            <div class="info-item">
+                                <div class="info-label">Contenedores Procesados</div>
+                                <div class="info-value">1,247</div>
+                            </div>
+                            <div class="info-item">
+                                <div class="info-label">Tiempo Óptimo</div>
+                                <div class="info-value">36h</div>
+                            </div>
+                            <div class="info-item">
+                                <div class="info-label">Tasa de Éxito</div>
+                                <div class="info-value">97.2%</div>
+                            </div>
+                            <div class="info-item">
+                                <div class="info-label">Reducción CO₂</div>
+                                <div class="info-value">15%</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Fase 4 Section -->
+                <div class="content-section" id="fase4">
+                    <div class="fase4-container">
+                        <div class="ia-header">
+                            <h2><i class="fas fa-robot"></i> Inteligencia Artificial Predictiva</h2>
+                            <p>Análisis inteligente de rutas logísticas y optimización de procesos</p>
+                        </div>
+
+                        <div class="ia-form">
+                            <h3><i class="fas fa-search"></i> Generador de Rutas Inteligentes</h3>
+                            <div class="input-group">
+                                <input type="text" id="producto-input" placeholder="Ingresa un producto (ej. café, banano, cacao)">
+                                <button onclick="analizarRuta()">
+                                    <i class="fas fa-brain"></i> Analizar Ruta
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="results-container" id="ia-results">
+                            <h4><i class="fas fa-route"></i> Resultados del Análisis</h4>
+                            <div class="result-item">
+                                <span class="info-label">Producto:</span>
+                                <span class="info-value" id="resultado-producto">-</span>
+                            </div>
+                            <div class="result-item">
+                                <span class="info-label">Ruta Completa:</span>
+                                <span class="info-value" id="resultado-ruta">-</span>
+                            </div>
+                            <div class="result-item">
+                                <span class="info-label">Transporte Recomendado:</span>
+                                <span class="info-value" id="resultado-transporte">-</span>
+                            </div>
+                            <div class="result-item">
+                                <span class="info-label">Tiempo Estimado:</span>
+                                <span class="info-value" id="resultado-tiempo">-</span>
+                            </div>
+                            <div class="result-item">
+                                <span class="info-label">Distancia Total:</span>
+                                <span class="info-value" id="resultado-distancia">-</span>
+                            </div>
+                            <div class="result-item">
+                                <span class="info-label">Emisiones CO₂:</span>
+                                <span class="info-value" id="resultado-co2">-</span>
+                            </div>
+                            <div class="result-item">
+                                <span class="info-label">Nodos Intermedios:</span>
+                                <span class="info-value" id="resultado-nodos">-</span>
+                            </div>
+                            
+                            <button class="download-btn">
+                                <i class="fas fa-file-pdf"></i> Descargar Informe PDF
+                            </button>
+                        </div>
+
+                        <div class="ia-map">
+                            <svg width="100%" height="100%" viewBox="0 0 600 300">
+                                <defs>
+                                    <linearGradient id="aiRouteGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                                        <stop offset="0%" style="stop-color:#8b5cf6;stop-opacity:1" />
+                                        <stop offset="100%" style="stop-color:#ec4899;stop-opacity:1" />
+                                    </linearGradient>
+                                </defs>
+                                <path d="M 50 150 Q 150 100 300 180 T 550 150" stroke="url(#aiRouteGradient)" stroke-width="6" fill="none"/>
+                                <circle cx="50" cy="150" r="10" fill="#8b5cf6"/>
+                                <circle cx="550" cy="150" r="10" fill="#ec4899"/>
+                                <circle cx="150" cy="100" r="6" fill="#f59e0b"/>
+                                <circle cx="300" cy="180" r="6" fill="#f59e0b"/>
+                                <text x="30" y="130" fill="#8b5cf6" font-size="12" font-weight="600">Origen</text>
+                                <text x="530" y="130" fill="#ec4899" font-size="12" font-weight="600">Destino</text>
+                            </svg>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Quality Banner -->
+            <div class="quality-banner">
+                Comprometidos con la calidad (ISO 9001), la trazabilidad y la sostenibilidad en la logística portuaria.
+            </div>
         </div>
     </div>
 
     <script>
-        let sesionIniciada = false;
-        let inventario = {};
-        let ventasDiarias = {};
-
-        function iniciarSesion() {
-            const usuario = document.getElementById("usuario").value;
-            const contraseña = document.getElementById("contraseña").value;
-            if (usuario === "admin" && contraseña === "1234") {
-                sesionIniciada = true;
-                document.getElementById("login-section").style.display = "none";
-                document.getElementById("acciones-section").style.display = "block";
-            } else {
-                document.getElementById("error-msg").textContent = "Usuario o contraseña incorrectos.";
+        // Products data for Phase 2
+        var products = [
+            {
+                id: 1,
+                name: 'Café Arábigo',
+                origin: 'Loja, Ecuador',
+                originPort: 'Puerto de Guayaquil, Ecuador',
+                destPort: 'Puerto de Long Beach, California, USA',
+                coords: {
+                    origin: [-4.0, -79.2],
+                    originPort: [-2.27, -79.9],
+                    destPort: [33.75, -118.19]
+                },
+                seaRoute: [
+                    [-2.27, -79.9],
+                    [-3, -83],
+                    [-4, -87],
+                    [-5, -91],
+                    [-6, -95],
+                    [-7, -99],
+                    [-7, -103],
+                    [-6, -107],
+                    [-4, -111],
+                    [-1, -114],
+                    [3, -116],
+                    [8, -117],
+                    [13, -117.5],
+                    [18, -118],
+                    [23, -118.1],
+                    [28, -118.15],
+                    [33.75, -118.19]
+                ]
+            },
+            {
+                id: 2,
+                name: 'Banano',
+                origin: 'El Oro, Ecuador',
+                originPort: 'Puerto Bolívar, Ecuador',
+                destPort: 'Puerto de Rotterdam, Países Bajos',
+                coords: {
+                    origin: [-3.26, -79.96],
+                    originPort: [-3.27, -79.98],
+                    destPort: [51.95, 4.14]
+                },
+                seaRoute: [
+                    [-3.27, -79.98],
+                    [-2, -82],
+                    [0, -84],
+                    [2, -86],
+                    [4, -87],
+                    [6, -88],
+                    [8, -88],
+                    [9, -84],
+                    [9.5, -79.5],
+                    [10, -76],
+                    [11, -73],
+                    [13, -69],
+                    [15, -65],
+                    [18, -60],
+                    [21, -54],
+                    [24, -47],
+                    [27, -39],
+                    [30, -31],
+                    [33, -22],
+                    [36, -13],
+                    [39, -6],
+                    [43, 0],
+                    [47, 2],
+                    [51, 3.5],
+                    [51.95, 4.14]
+                ]
+            },
+            {
+                id: 3,
+                name: 'Rosas',
+                origin: 'Cayambe, Ecuador',
+                originPort: 'Aeropuerto de Quito, Ecuador',
+                destPort: 'Aeropuerto JFK, Nueva York, USA',
+                coords: {
+                    origin: [0.04, -78.14],
+                    originPort: [-0.14, -78.49],
+                    destPort: [40.64, -73.78]
+                },
+                seaRoute: [
+                    [-0.14, -78.49],
+                    [40.64, -73.78]
+                ]
+            },
+            {
+                id: 4,
+                name: 'Cacao',
+                origin: 'Los Ríos, Ecuador',
+                originPort: 'Puerto de Guayaquil, Ecuador',
+                destPort: 'Puerto de Amberes, Bélgica',
+                coords: {
+                    origin: [-1.06, -79.46],
+                    originPort: [-2.27, -79.9],
+                    destPort: [51.22, 4.40]
+                },
+                seaRoute: [
+                    [-2.27, -79.9],
+                    [-2, -82],
+                    [0, -84],
+                    [2, -86],
+                    [4, -87],
+                    [6, -88],
+                    [8, -88],
+                    [9, -84],
+                    [9.5, -79.5],
+                    [10, -76],
+                    [11, -73],
+                    [13, -69],
+                    [15, -65],
+                    [18, -60],
+                    [21, -54],
+                    [24, -47],
+                    [27, -39],
+                    [30, -31],
+                    [33, -22],
+                    [36, -13],
+                    [39, -6],
+                    [43, 0],
+                    [47, 2.5],
+                    [51, 4],
+                    [51.22, 4.40]
+                ]
+            },
+            {
+                id: 5,
+                name: 'Camarón',
+                origin: 'Guayas, Ecuador',
+                originPort: 'Puerto de Guayaquil, Ecuador',
+                destPort: 'Puerto de Shanghai, China',
+                coords: {
+                    origin: [-2.19, -79.88],
+                    originPort: [-2.27, -79.9],
+                    destPort: [31.23, 121.47]
+                },
+                seaRoute: [
+                    [-2.27, -79.9],
+                    [-4, -86],
+                    [-7, -94],
+                    [-10, -102],
+                    [-14, -110],
+                    [-18, -118],
+                    [-22, -126],
+                    [-26, -134],
+                    [-29, -142],
+                    [-31, -150],
+                    [-32, -158],
+                    [-31, -166],
+                    [-29, -173],
+                    [-26, -179],
+                    [-22, 175],
+                    [-18, 168],
+                    [-14, 161],
+                    [-10, 155],
+                    [-6, 150],
+                    [-2, 146],
+                    [2, 142],
+                    [6, 139],
+                    [10, 136],
+                    [14, 133],
+                    [18, 130],
+                    [22, 127],
+                    [26, 124],
+                    [31.23, 121.47]
+                ]
+            },
+            {
+                id: 6,
+                name: 'Atún',
+                origin: 'Manta, Ecuador',
+                originPort: 'Puerto de Manta, Ecuador',
+                destPort: 'Puerto de Miami, USA',
+                coords: {
+                    origin: [-0.95, -80.73],
+                    originPort: [-0.96, -80.71],
+                    destPort: [25.77, -80.19]
+                },
+                seaRoute: [
+                    [-0.96, -80.71],
+                    [0, -83],
+                    [2, -85],
+                    [4, -87],
+                    [6, -88],
+                    [8, -88],
+                    [9, -84],
+                    [9.5, -79.5],
+                    [10, -77],
+                    [11, -75.5],
+                    [13, -75],
+                    [15, -75],
+                    [17, -75.5],
+                    [19, -76.5],
+                    [21, -77.5],
+                    [23, -78.5],
+                    [25, -79.5],
+                    [25.77, -80.19]
+                ]
+            },
+            {
+                id: 7,
+                name: 'Petróleo Crudo',
+                origin: 'Lago Agrio, Ecuador',
+                originPort: 'Terminal Petrolero Balao, Esmeraldas',
+                destPort: 'Puerto de Houston, Texas, USA',
+                coords: {
+                    origin: [0.08, -76.88],
+                    originPort: [0.96, -79.65],
+                    destPort: [29.76, -95.36]
+                },
+                seaRoute: [
+                    [0.96, -79.65],
+                    [2, -82],
+                    [4, -85],
+                    [6, -87],
+                    [8, -88],
+                    [9, -84],
+                    [9.5, -79.5],
+                    [10, -77],
+                    [11, -76],
+                    [13, -76],
+                    [15, -77],
+                    [17, -79],
+                    [19, -82],
+                    [21, -85],
+                    [23, -88],
+                    [25, -91],
+                    [27, -93.5],
+                    [29.76, -95.36]
+                ]
+            },
+            {
+                id: 8,
+                name: 'Flores',
+                origin: 'Cotopaxi, Ecuador',
+                originPort: 'Aeropuerto de Quito, Ecuador',
+                destPort: 'Aeropuerto de Miami, USA',
+                coords: {
+                    origin: [-0.68, -78.61],
+                    originPort: [-0.14, -78.49],
+                    destPort: [25.79, -80.29]
+                },
+                seaRoute: [
+                    [-0.14, -78.49],
+                    [25.79, -80.29]
+                ]
+            },
+            {
+                id: 9,
+                name: 'Madera de Balsa',
+                origin: 'Guayas, Ecuador',
+                originPort: 'Puerto de Guayaquil, Ecuador',
+                destPort: 'Puerto de Los Ángeles, USA',
+                coords: {
+                    origin: [-2.19, -79.88],
+                    originPort: [-2.27, -79.9],
+                    destPort: [33.74, -118.27]
+                },
+                seaRoute: [
+                    [-2.27, -79.9],
+                    [-3, -83],
+                    [-4, -87],
+                    [-5, -91],
+                    [-6, -95],
+                    [-7, -99],
+                    [-7, -103],
+                    [-6, -107],
+                    [-4, -111],
+                    [-1, -114],
+                    [3, -116],
+                    [8, -117],
+                    [13, -117.5],
+                    [18, -118],
+                    [23, -118.1],
+                    [28, -118.2],
+                    [33.74, -118.27]
+                ]
+            },
+            {
+                id: 10,
+                name: 'Oro',
+                origin: 'Zamora Chinchipe, Ecuador',
+                originPort: 'Puerto de Guayaquil, Ecuador',
+                destPort: 'Puerto de Dubai, UAE',
+                coords: {
+                    origin: [-4.07, -78.95],
+                    originPort: [-2.27, -79.9],
+                    destPort: [25.27, 55.30]
+                },
+                seaRoute: [
+                    [-2.27, -79.9],
+                    [-4, -86],
+                    [-7, -94],
+                    [-10, -102],
+                    [-14, -110],
+                    [-18, -118],
+                    [-22, -126],
+                    [-26, -134],
+                    [-29, -142],
+                    [-31, -150],
+                    [-32, -158],
+                    [-31, -166],
+                    [-29, -173],
+                    [-26, -179],
+                    [-22, 175],
+                    [-18, 168],
+                    [-14, 161],
+                    [-10, 154],
+                    [-6, 147],
+                    [-2, 140],
+                    [1, 132],
+                    [3, 123],
+                    [5, 114],
+                    [6, 105],
+                    [7, 96],
+                    [8, 87],
+                    [9, 78],
+                    [11, 70],
+                    [14, 63],
+                    [18, 58],
+                    [22, 56],
+                    [25.27, 55.30]
+                ]
+            },
+            {
+                id: 11,
+                name: 'Palmito',
+                origin: 'Esmeraldas, Ecuador',
+                originPort: 'Puerto de Esmeraldas, Ecuador',
+                destPort: 'Puerto de Barcelona, España',
+                coords: {
+                    origin: [0.97, -79.65],
+                    originPort: [0.96, -79.65],
+                    destPort: [41.35, 2.17]
+                },
+                seaRoute: [
+                    [0.96, -79.65],
+                    [2, -82],
+                    [4, -85],
+                    [6, -87],
+                    [8, -88],
+                    [9, -84],
+                    [9.5, -79.5],
+                    [10, -76],
+                    [12, -72],
+                    [14, -68],
+                    [17, -63],
+                    [20, -57],
+                    [23, -51],
+                    [26, -44],
+                    [29, -36],
+                    [32, -28],
+                    [35, -19],
+                    [37, -11],
+                    [39, -4],
+                    [41.35, 2.17]
+                ]
+            },
+            {
+                id: 12,
+                name: 'Pescado Enlatado',
+                origin: 'Manta, Ecuador',
+                originPort: 'Puerto de Manta, Ecuador',
+                destPort: 'Puerto de Veracruz, México',
+                coords: {
+                    origin: [-0.95, -80.73],
+                    originPort: [-0.96, -80.71],
+                    destPort: [19.19, -96.13]
+                },
+                seaRoute: [
+                    [-0.96, -80.71],
+                    [0, -83],
+                    [2, -85],
+                    [4, -87],
+                    [6, -88],
+                    [8, -88],
+                    [9, -84],
+                    [9.5, -79.5],
+                    [10, -77],
+                    [11, -76],
+                    [13, -77],
+                    [15, -80],
+                    [17, -84],
+                    [18.5, -89],
+                    [19, -93],
+                    [19.19, -96.13]
+                ]
             }
+        ];
+
+        var map;
+        var selectedProduct = null;
+        var markers = [];
+        var polylines = [];
+        var routingControl = null;
+
+        function initMap() {
+            map = L.map('map').setView([-1.8, -78.5], 3);
+            
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: 'OpenStreetMap'
+            }).addTo(map);
         }
 
-        function cerrarSesion() {
-            sesionIniciada = false;
-            document.getElementById("login-section").style.display = "block";
-            document.getElementById("acciones-section").style.display = "none";
+        function calculateDistance(coord1, coord2) {
+            var R = 6371;
+            var dLat = (coord2[0] - coord1[0]) * Math.PI / 180;
+            var dLng = (coord2[1] - coord1[1]) * Math.PI / 180;
+            var a = Math.sin(dLat/2) * Math.sin(dLat/2) +
+                      Math.cos(coord1[0] * Math.PI / 180) * Math.cos(coord2[0] * Math.PI / 180) *
+                      Math.sin(dLng/2) * Math.sin(dLng/2);
+            var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+            return Math.round(R * c);
         }
 
-        function mostrarControlStock() {
-            document.getElementById("control-stock-section").style.display = "block";
+        function calculateRouteDistance(route) {
+            var totalDist = 0;
+            for (var i = 0; i < route.length - 1; i++) {
+                totalDist += calculateDistance(route[i], route[i + 1]);
+            }
+            return totalDist;
         }
 
-        function actualizarStock() {
-            const producto = document.getElementById("producto").value;
-            const cantidad = parseInt(document.getElementById("cantidad").value);
+        function clearMap() {
+            var i;
+            for (i = 0; i < markers.length; i++) {
+                map.removeLayer(markers[i]);
+            }
+            for (i = 0; i < polylines.length; i++) {
+                map.removeLayer(polylines[i]);
+            }
+            if (routingControl) {
+                map.removeControl(routingControl);
+                routingControl = null;
+            }
+            markers = [];
+            polylines = [];
+        }
 
-            if (producto && cantidad > 0) {
-                if (inventario[producto]) {
-                    inventario[producto] += cantidad;
-                } else {
-                    inventario[producto] = cantidad;
-                    ventasDiarias[producto] = 0;
+        function showRoute(product) {
+            clearMap();
+
+            var greenIcon = L.icon({
+                iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-green.png',
+                shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
+                iconSize: [25, 41],
+                iconAnchor: [12, 41],
+                popupAnchor: [1, -34],
+                shadowSize: [41, 41]
+            });
+
+            var originMarker = L.marker(product.coords.origin, {icon: greenIcon}).addTo(map);
+            originMarker.bindPopup('<b>Zona de Producción</b><br>' + product.origin);
+            markers.push(originMarker);
+var blueIcon = L.icon({
+                iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-blue.png',
+                shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
+                iconSize: [25, 41],
+                iconAnchor: [12, 41],
+                popupAnchor: [1, -34],
+                shadowSize: [41, 41]
+            });
+
+            var originPortMarker = L.marker(product.coords.originPort, {icon: blueIcon}).addTo(map);
+            originPortMarker.bindPopup('<b>Puerto de Origen</b><br>' + product.originPort);
+            markers.push(originPortMarker);
+
+            var redIcon = L.icon({
+                iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-red.png',
+                shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
+                iconSize: [25, 41],
+                iconAnchor: [12, 41],
+                popupAnchor: [1, -34],
+                shadowSize: [41, 41]
+            });
+
+            var destMarker = L.marker(product.coords.destPort, {icon: redIcon}).addTo(map);
+            destMarker.bindPopup('<b>Puerto de Destino</b><br>' + product.destPort);
+            markers.push(destMarker);
+
+            try {
+                routingControl = L.Routing.control({
+                    waypoints: [
+                        L.latLng(product.coords.origin[0], product.coords.origin[1]),
+                        L.latLng(product.coords.originPort[0], product.coords.originPort[1])
+                    ],
+                    routeWhileDragging: false,
+                    addWaypoints: false,
+                    draggableWaypoints: false,
+                    fitSelectedRoutes: false,
+                    showAlternatives: false,
+                    lineOptions: {
+                        styles: [{color: '#3b82f6', opacity: 0.9, weight: 6}]
+                    },
+                    createMarker: function() { return null; }
+                }).addTo(map);
+            } catch(e) {
+                console.log('Error en routing:', e);
+            }
+
+            var seaLine = L.polyline(product.seaRoute, {
+                color: '#ef4444',
+                weight: 5,
+                opacity: 0.85
+            }).addTo(map);
+            polylines.push(seaLine);
+
+            setTimeout(function() {
+                var allCoords = [product.coords.origin, product.coords.originPort, product.coords.destPort];
+                for (var i = 0; i < product.seaRoute.length; i++) {
+                    allCoords.push(product.seaRoute[i]);
                 }
-                document.getElementById("stock-msg").textContent = "Stock actualizado.";
-                document.getElementById("producto").value = "";
-                document.getElementById("cantidad").value = "";
-                actualizarListaProductos();
-            } else {
-                document.getElementById("stock-msg").textContent = "Por favor ingresa un producto y una cantidad válida.";
+                var bounds = L.latLngBounds(allCoords);
+                map.fitBounds(bounds, { padding: [50, 50] });
+            }, 1000);
+
+            var roadDist = calculateDistance(product.coords.origin, product.coords.originPort);
+            var seaDist = calculateRouteDistance(product.seaRoute);
+            showRouteInfo(product, roadDist, seaDist);
+        }
+
+        function showRouteInfo(product, roadDist, seaDist) {
+            var totalDist = roadDist + seaDist;
+            
+            var usesCanal = false;
+            for (var i = 0; i < product.seaRoute.length; i++) {
+                if (product.seaRoute[i][0] >= 8 && product.seaRoute[i][0] <= 10 && 
+                    product.seaRoute[i][1] >= -88 && product.seaRoute[i][1] <= -79) {
+                    usesCanal = true;
+                    break;
+                }
+            }
+
+            var html = '<div class="route-step road">' +
+                '<div class="step-content">' +
+                '<div class="step-title">Ruta Terrestre (Azul)</div>' +
+                '<div class="step-location">Desde: ' + product.origin + '</div>' +
+                '<div class="step-location">Hasta: ' + product.originPort + '</div>' +
+                '<div class="step-distance">Distancia por carretera: ~' + roadDist.toLocaleString() + ' km</div>' +
+                '</div></div>' +
+                
+                '<div class="route-step sea">' +
+                '<div class="step-content">' +
+                '<div class="step-title">Ruta Marítima (Rojo)' + (usesCanal ? ' - Vía Canal de Panamá' : ' - Vía Pacífico') + '</div>' +
+                '<div class="step-location">Desde: ' + product.originPort + '</div>' +
+                '<div class="step-location">Hasta: ' + product.destPort + '</div>' +
+                '<div class="step-distance">Distancia marítima: ~' + seaDist.toLocaleString() + ' km</div>' +
+                '</div></div>' +
+                
+                '<div class="route-step destination">' +
+                '<div class="step-content">' +
+                '<div class="step-title">Puerto Final</div>' +
+                '<div class="step-location">' + product.destPort + '</div>' +
+                '<div class="step-distance">Destino final del producto</div>' +
+                '</div></div>' +
+                
+                '<div class="route-step" style="background: linear-gradient(135deg, #3b82f6 0%, #10b981 100%); color: white; border-left: none;">' +
+                '<div class="step-content">' +
+                '<div class="step-title">Distancia Total</div>' +
+                '<div class="step-location" style="color: white;">' + totalDist.toLocaleString() + ' km aproximadamente</div>' +
+                '</div></div>';
+
+            document.getElementById('routeSteps').innerHTML = html;
+            document.getElementById('routeInfo').classList.add('active');
+        }
+
+        function renderProductList() {
+            var listEl = document.getElementById('productList');
+            var html = '';
+            
+            for (var i = 0; i < products.length; i++) {
+                var product = products[i];
+                html += '<button class="product-btn" onclick="selectProduct(' + product.id + ')">' +
+                    '<div class="product-name">' + product.name + '</div>' +
+                    '<div class="product-origin">' + product.origin + '</div>' +
+                    '</button>';
+            }
+            
+            listEl.innerHTML = html;
+        }
+
+        function selectProduct(id) {
+            for (var i = 0; i < products.length; i++) {
+                if (products[i].id === id) {
+                    selectedProduct = products[i];
+                    break;
+                }
+            }
+            
+            var buttons = document.querySelectorAll('.product-btn');
+            for (var i = 0; i < buttons.length; i++) {
+                if (products[i].id === id) {
+                    buttons[i].classList.add('active');
+                } else {
+                    buttons[i].classList.remove('active');
+                }
+            }
+
+            showRoute(selectedProduct);
+        }
+
+        // Navigation
+        function showSection(sectionId) {
+            // Hide all sections
+            document.querySelectorAll('.content-section').forEach(section => {
+                section.classList.remove('active');
+            });
+            
+            // Show selected section
+            document.getElementById(sectionId).classList.add('active');
+            
+            // Update menu active state
+            document.querySelectorAll('.menu-item').forEach(item => {
+                item.classList.remove('active');
+            });
+            
+            // Find and activate the corresponding menu item
+            const menuItem = document.querySelector(`[data-section="${sectionId}"]`);
+            if (menuItem) {
+                menuItem.classList.add('active');
+            }
+            
+            // Initialize map if fase2 is selected
+            if (sectionId === 'fase2' && !map) {
+                setTimeout(function() {
+                    initMap();
+                    renderProductList();
+                }, 100);
+            }
+            
+            // Close sidebar on mobile after selection
+            if (window.innerWidth <= 768) {
+                document.getElementById('sidebar').classList.remove('active');
             }
         }
 
-        function actualizarListaProductos() {
-            const listaProductos = document.getElementById("lista-productos");
-            listaProductos.innerHTML = "";
+        // Menu click handlers
+        document.querySelectorAll('.menu-item').forEach(item => {
+            item.addEventListener('click', () => {
+                const sectionId = item.getAttribute('data-section');
+                showSection(sectionId);
+            });
+        });
 
-            for (let producto in inventario) {
-                const item = document.createElement("li");
-                item.textContent = `${producto}: ${inventario[producto]} unidades`;
-                listaProductos.appendChild(item);
+        // Mobile sidebar toggle
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            sidebar.classList.toggle('active');
+        }
+
+        // IA Analysis for Phase 4
+        function analizarRuta() {
+            const producto = document.getElementById('producto-input').value || 'Cacao';
+            const resultados = document.getElementById('ia-results');
+            
+            // Update result values
+            document.getElementById('resultado-producto').textContent = producto;
+            document.getElementById('resultado-ruta').textContent = 'Guayaquil → Rotterdam (Holanda)';
+            document.getElementById('resultado-transporte').textContent = 'Marítimo + Terrestre';
+            document.getElementById('resultado-tiempo').textContent = '28 días';
+            document.getElementById('resultado-distancia').textContent = '9,850 km';
+            document.getElementById('resultado-co2').textContent = '12.4 toneladas';
+            document.getElementById('resultado-nodos').textContent = 'Puerto Balao, Panamá, Cartagena';
+            
+            // Show results
+            resultados.style.display = 'block';
+            
+            // Scroll to results
+            resultados.scrollIntoView({ behavior: 'smooth' });
+        }
+
+        // Card button functionality
+        document.querySelectorAll('.card-button').forEach(button => {
+            button.addEventListener('click', function() {
+                const cardTitle = this.closest('.card').querySelector('.card-title').textContent;
+                alert(`Descargando documento PDF: ${cardTitle}...`);
+            });
+        });
+
+        // Download PDF functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            const downloadBtn = document.querySelector('.download-btn');
+            if (downloadBtn) {
+                downloadBtn.addEventListener('click', function() {
+                    alert('Generando informe PDF... En una implementación real, esto descargaría el archivo.');
+                });
             }
-        }
+        });
 
-        function mostrarAgregarTransaccion() {
-            document.getElementById("transaccion-section").style.display = "block";
-        }
-
-        function agregarTransaccion() {
-            const referencia = document.getElementById("referencia").value;
-            const valor = parseFloat(document.getElementById("valor").value);
-            const cantidadVendida = parseInt(document.getElementById("cantidad-vendida").value);
-
-            if (inventario[referencia] && cantidadVendida <= inventario[referencia]) {
-                inventario[referencia] -= cantidadVendida;
-                ventasDiarias[referencia] += cantidadVendida;
-                document.getElementById("transaccion-msg").textContent = "Transacción agregada exitosamente.";
-                document.getElementById("referencia").value = "";
-                document.getElementById("valor").value = "";
-                document.getElementById("cantidad-vendida").value = "";
-                actualizarListaProductos();
-            } else {
-                document.getElementById("transaccion-msg").textContent = "Producto no disponible o cantidad excede el stock.";
-            }
-        }
-
-        function generarResumen() {
-            let totalCantidadVendida = 0;
-            let totalProductos = 0;
-            let totalVentas = 0;
-            let resumenProductos = "Productos vendidos y existencias:\n";
-            for (let producto in inventario) {
-                const cantidadVendida = ventasDiarias[producto];
-                resumenProductos += `Producto: ${producto}, Vendido: ${cantidadVendida} unidades, Existencias: ${inventario[producto]} unidades\n`;
-                totalCantidadVendida += cantidadVendida;
-                totalProductos += inventario[producto];
-                totalVentas += cantidadVendida * 10;
-            }
-
-            const promedioVentas = totalCantidadVendida > 0 ? (totalVentas / totalCantidadVendida).toFixed(2) : 0;
-
-            document.getElementById("resumen-total").textContent = `Total de productos en stock: ${totalProductos}`;
-            document.getElementById("resumen-productos").textContent = resumenProductos;
-            document.getElementById("resumen-promedio").textContent = `Promedio de ventas: $${promedioVentas}`;
-            document.getElementById("resumen-section").style.display = "block";
-        }
-
-        function mostrarPronostico() {
-            document.getElementById("pronostico-section").style.display = "block";
-        }
-
-        function calcularPronostico() {
-            const intervalo = document.getElementById("intervalo").value;
-            const datosDemanda = document.getElementById("datos-demanda").value.split(",").map(Number);
-
-            if (datosDemanda.length < 2) {
-                document.getElementById("pronostico-msg").textContent = "Por favor ingresa al menos dos datos para calcular el pronóstico.";
-                return;
-            }
-
-            const n = datosDemanda.length;
-            const sumX = datosDemanda.reduce((acc, _, i) => acc + i, 0);
-            const sumY = datosDemanda.reduce((acc, y) => acc + y, 0);
-            const sumXY = datosDemanda.reduce((acc, y, i) => acc + i * y, 0);
-            const sumX2 = datosDemanda.reduce((acc, _, i) => acc + i * i, 0);
-
-            const slope = (n * sumXY - sumX * sumY) / (n * sumX2 - sumX * sumX);
-            const intercept = (sumY - slope * sumX) / n;
-
-            const pronostico = slope * n + intercept;
-            document.getElementById("pronostico-msg").textContent = `Pronóstico para el próximo ${intervalo}: ${pronostico.toFixed(2)} unidades.`;
-        }
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            // Close sidebar when clicking outside on mobile
+            document.addEventListener('click', function(event) {
+                const sidebar = document.getElementById('sidebar');
+                const menuBtn = document.querySelector('.mobile-menu-btn');
+                
+                if (window.innerWidth <= 768 && 
+                    sidebar.classList.contains('active') && 
+                    !sidebar.contains(event.target) && 
+                    event.target !== menuBtn) {
+                    sidebar.classList.remove('active');
+                }
+            });
+        });
     </script>
 </body>
 </html>
