@@ -573,7 +573,12 @@
             border-radius: 16px;
         }
 
-    
+            .content-section {
+            display: none;
+        }
+        .content-section.active {
+            display: block;
+        }
         .fase4-container {
             max-width: 800px;
             margin: 0 auto;
@@ -972,95 +977,65 @@
                 
 <!-- Fase 4 Section -->
 <div class="content-section" id="fase4">
-    <div class="container-card">
-        <h2><i class="fas fa-route"></i> Visualización de Ruta Origen - Destino</h2>
-        <p style="color:#cbd5e1;margin-bottom:15px">
-            Gráfico interactivo de la ruta logística generada por el sistema.
-        </p>
+    
+    <h2><i class="fas fa-route"></i> Visualización Inteligente de Ruta</h2>
+    <p style="color:#cbd5e1; margin-bottom:20px;">
+        Análisis predictivo del transporte según el producto seleccionado.
+    </p>
 
-        <!-- IA Map (solo visible en Fase 4) -->
-        <div class="ia-map">
-            <svg width="100%" height="260" viewBox="0 0 1000 300">
-                
-                <!-- Línea curva -->
-                <path d="M 100 200 C 300 50, 600 350, 900 150" 
-                      stroke="url(#gradient)" 
-                      stroke-width="10" 
-                      fill="none" />
+    <!-- MAPA SOLO EN FASE 4 -->
+    <div class="ia-map">
+        <svg width="100%" height="260" viewBox="0 0 1000 300">
+            <path d="M 100 200 C 300 50, 600 350, 900 150" 
+                stroke="url(#gradient)" 
+                stroke-width="10" 
+                fill="none" />
 
-                <!-- Gradiente -->
-                <defs>
-                    <linearGradient id="gradient" x1="0" x2="1" y1="0" y2="0">
-                        <stop offset="0%" stop-color="#8b5cf6"/>
-                        <stop offset="100%" stop-color="#ec4899"/>
-                    </linearGradient>
-                </defs>
+            <defs>
+                <linearGradient id="gradient" x1="0" x2="1" y1="0" y2="0">
+                    <stop offset="0%" stop-color="#8b5cf6"/>
+                    <stop offset="100%" stop-color="#ec4899"/>
+                </linearGradient>
+            </defs>
 
-                <!-- Origen -->
-                <circle cx="100" cy="200" r="15" fill="#8b5cf6"></circle>
-                <text x="100" y="185" fill="#8b5cf6" font-size="16" text-anchor="middle">Origen</text>
+            <circle cx="100" cy="200" r="15" fill="#8b5cf6"></circle>
+            <text x="100" y="185" fill="#8b5cf6" font-size="16" text-anchor="middle">Origen</text>
 
-                <!-- Puntos intermedios -->
-                <circle cx="400" cy="120" r="10" fill="#f59e0b"></circle>
-                <circle cx="650" cy="230" r="10" fill="#f59e0b"></circle>
+            <circle cx="400" cy="120" r="10" fill="#f59e0b"></circle>
+            <circle cx="650" cy="230" r="10" fill="#f59e0b"></circle>
 
-                <!-- Destino -->
-                <circle cx="900" cy="150" r="15" fill="#ec4899"></circle>
-                <text x="900" y="135" fill="#ec4899" font-size="16" text-anchor="middle">Destino</text>
+            <circle cx="900" cy="150" r="15" fill="#ec4899"></circle>
+            <text x="900" y="135" fill="#ec4899" font-size="16" text-anchor="middle">Destino</text>
+        </svg>
+    </div>
 
-            </svg>
+    <!-- FORMULARIO -->
+    <div class="ia-form" style="margin-top:20px;">
+        <h3><i class="fas fa-search"></i> Generador de Rutas Inteligentes</h3>
+
+        <div class="input-group">
+            <input type="text" id="producto-input" placeholder="Ingresa un producto (ej. café, cacao)">
+            <button onclick="analizarRuta()">
+                <i class="fas fa-brain"></i> Analizar Ruta
+            </button>
         </div>
     </div>
+
+    <!-- RESULTADOS -->
+    <div class="results-container" id="ia-results" style="margin-top:25px">
+        <h4><i class="fas fa-route"></i> Resultados del Análisis</h4>
+
+        <div class="result-item"><span class="info-label">Producto:</span> <span class="info-value" id="resultado-producto">-</span></div>
+        <div class="result-item"><span class="info-label">Ruta Completa:</span> <span class="info-value" id="resultado-ruta">-</span></div>
+        <div class="result-item"><span class="info-label">Transporte Recomendado:</span> <span class="info-value" id="resultado-transporte">-</span></div>
+        <div class="result-item"><span class="info-label">Tiempo Estimado:</span> <span class="info-value" id="resultado-tiempo">-</span></div>
+        <div class="result-item"><span class="info-label">Distancia Total:</span> <span class="info-value" id="resultado-distancia">-</span></div>
+        <div class="result-item"><span class="info-label">Emisiones CO₂:</span> <span class="info-value" id="resultado-co2">-</span></div>
+        <div class="result-item"><span class="info-label">Nodos Intermedios:</span> <span class="info-value" id="resultado-nodos">-</span></div>
+    </div>
+
 </div>
 
-<div class="ia-form">
-    <h3><i class="fas fa-search"></i> Generador de Rutas Inteligentes</h3>
-    <div class="input-group">
-        <input type="text" id="producto-input" placeholder="Ingresa un producto (ej. café, banano, cacao)">
-        <button onclick="analizarRuta()">
-            <i class="fas fa-brain"></i> Analizar Ruta
-        </button>
-    </div>
-</div>
-
-<div class="results-container" id="ia-results" style="margin-top:25px">
-    <h4><i class="fas fa-route"></i> Resultados del Análisis</h4>
-
-    <div class="result-item">
-        <span class="info-label">Producto:</span>
-        <span class="info-value" id="resultado-producto">-</span>
-    </div>
-
-    <div class="result-item">
-        <span class="info-label">Ruta Completa:</span>
-        <span class="info-value" id="resultado-ruta">-</span>
-    </div>
-
-    <div class="result-item">
-        <span class="info-label">Transporte Recomendado:</span>
-        <span class="info-value" id="resultado-transporte">-</span>
-    </div>
-
-    <div class="result-item">
-        <span class="info-label">Tiempo Estimado:</span>
-        <span class="info-value" id="resultado-tiempo">-</span>
-    </div>
-
-    <div class="result-item">
-        <span class="info-label">Distancia Total:</span>
-        <span class="info-value" id="resultado-distancia">-</span>
-    </div>
-
-    <div class="result-item">
-        <span class="info-label">Emisiones CO₂:</span>
-        <span class="info-value" id="resultado-co2">-</span>
-    </div>
-
-    <div class="result-item">
-        <span class="info-label">Nodos Intermedios:</span>
-        <span class="info-value" id="resultado-nodos">-</span>
-    </div>
-</div>
 
 
             <!-- Quality Banner -->
