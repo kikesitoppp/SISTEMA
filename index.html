@@ -322,25 +322,23 @@
             font-size: 1.1rem;
         }
 
-        .options {
-            display: grid;
-            gap: 12px;
-        }
+.option {
+    padding: 8px;
+    margin: 4px;
+    border-radius: 8px;
+    border: 1px solid transparent;
+    cursor: pointer;
+    transition: 0.3s;
+}
 
-        .option {
-            padding: 15px 20px;
-            background: rgba(30, 41, 59, 0.5);
-            border: 1px solid rgba(100, 116, 139, 0.3);
-            border-radius: 8px;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            color: #cbd5e1;
-        }
+.option:hover {
+    background: rgba(255,255,255,0.08);
+}
 
-        .option:hover {
-            background: rgba(59, 130, 246, 0.2);
-            border-color: rgba(59, 130, 246, 0.5);
-        }
+.option.selected {
+    background: #0ea5e944;
+    border: 1px solid #38bdf8;
+}
 
         /* Fase 2 Styles - Mapa Interactivo */
         .fase2-full-container {
@@ -839,37 +837,65 @@
                             <p style="text-align: center; margin-top: 10px; color: #94a3b8;">Calidad en operaciones portuarias: del estándar a la práctica
 </p>
                             
-                            <div class="quiz-container">
-                                <h3>Cuestionario Interactivo</h3>
-                                <div class="question">
-                                    <h4>1. ¿Cuál es el propósito principal de la norma ISO 9001 en logística portuaria?</h4>
-                                    <div class="options">
-                                        <div class="option">A) Reducir costos operativos</div>
-                                        <div class="option">B) Establecer un sistema de gestión de calidad</div>
-                                        <div class="option">C) Aumentar la velocidad de procesamiento</div>
-                                        <div class="option">D) Mejorar la seguridad laboral</div>
-                                    </div>
-                                </div>
-                                <div class="question">
-                                    <h4>2. ¿Qué proceso es fundamental para el control de calidad en puertos?</h4>
-                                    <div class="options">
-                                        <div class="option">A) Inspección de mercancías</div>
-                                        <div class="option">B) Marketing de servicios</div>
-                                        <div class="option">C) Desarrollo de software</div>
-                                        <div class="option">D) Capacitación administrativa</div>
-                                    </div>
-                                </div>
-                                <div class="question">
-                                    <h4>3. ¿Cuál norma ISO se enfoca en la gestión ambiental en operaciones portuarias?</h4>
-                                    <div class="options">
-                                        <div class="option">A) ISO 9001</div>
-                                        <div class="option">B) ISO 14001</div>
-                                        <div class="option">C) ISO 28000</div>
-                                        <div class="option">D) ISO 45001</div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+                 <div class="quiz-container">
+    <h3>Cuestionario Interactivo</h3>
+
+    <div class="question" data-correct="B">
+        <h4>1. ¿Cuál de las siguientes NO es una función principal de los Sistemas de Información Geográfica (SIG) en logística?</h4>
+        <div class="options">
+            <div class="option">A) Visualizar rutas en mapas digitales</div>
+            <div class="option">B) Generar rutas en tiempo real con ajuste automático ante congestión vial</div>
+            <div class="option">C) Analizar datos espaciales como distancias, pendientes y restricciones de peso</div>
+            <div class="option">D) Integrar bases de datos logísticas con información geográfica</div>
+        </div>
+    </div>
+
+    <div class="question" data-correct="C">
+        <h4>2. ¿Qué componente de un puerto se encarga específicamente de proteger el interior de las olas y corrientes marinas?</h4>
+        <div class="options">
+            <div class="option">A) Dársena de maniobra</div>
+            <div class="option">B) Canal de acceso</div>
+            <div class="option">C) Diques de abrigo (rompeolas)</div>
+            <div class="option">D) Plataforma portuaria</div>
+        </div>
+    </div>
+
+    <div class="question" data-correct="C">
+        <h4>3. ¿Qué tipo de software logístico utiliza algoritmos del TSP y VRP para optimizar entregas?</h4>
+        <div class="options">
+            <div class="option">A) Sistemas de Gestión de Transporte (TMS)</div>
+            <div class="option">B) Plataformas de navegación como Waze</div>
+            <div class="option">C) Software de Optimización de Rutas Logísticas</div>
+            <div class="option">D) Aplicaciones de telemetría vehicular</div>
+        </div>
+    </div>
+
+    <div class="question" data-correct="C">
+        <h4>4. ¿En qué zona portuaria se almacenan temporalmente los contenedores?</h4>
+        <div class="options">
+            <div class="option">A) Almacenes aduaneros</div>
+            <div class="option">B) Plataforma portuaria</div>
+            <div class="option">C) Patios de contenedores</div>
+            <div class="option">D) Terminales Ro-Ro</div>
+        </div>
+    </div>
+
+    <div class="question" data-correct="B">
+        <h4>5. ¿Cuál de las siguientes herramientas permite simular escenarios logísticos?</h4>
+        <div class="options">
+            <div class="option">A) Google Maps API</div>
+            <div class="option">B) FlexSim</div>
+            <div class="option">C) Onfleet</div>
+            <div class="option">D) Geotab</div>
+        </div>
+    </div>
+
+    <button class="quiz-submit" onclick="calcularResultado()">Enviar respuestas</button>
+
+    <div id="quiz-result" style="display:none; margin-top:20px;"></div>
+    <button id="quiz-retry" style="display:none; margin-top:15px;" onclick="reiniciarQuiz()">Volver a intentar</button>
+</div>
+
 
                         <div class="cards-container">
                             <div class="card">
@@ -1759,6 +1785,57 @@ var blueIcon = L.icon({
 }
     </script>
 
+
+       
+<script>
+document.querySelectorAll('.option').forEach(opt => {
+    opt.addEventListener('click', function() {
+        const siblings = this.parentNode.querySelectorAll('.option');
+        siblings.forEach(s => s.classList.remove('selected'));
+        this.classList.add('selected');
+    });
+});
+       
+function calcularResultado() {
+    let score = 0;
+    const questions = document.querySelectorAll('.question');
+
+    questions.forEach(q => {
+        const correctAns = q.getAttribute('data-correct');
+        const selected = q.querySelector('.option.selected');
+
+        if (selected) {
+            if (selected.textContent.trim().startsWith(correctAns)) {
+                score += 10;
+                selected.style.background = '#16a34a44';
+                selected.style.border = '1px solid #22c55e';
+            } else {
+                selected.style.background = '#dc262644';
+                selected.style.border = '1px solid #ef4444';
+            }
+        }
+    });
+       
+
+    const result = document.getElementById("quiz-result");
+    result.style.display = "block";
+    result.innerHTML = `<h3>Puntaje obtenido: <span style="color:#38bdf8">${score} / 50</span></h3>`;
+
+    document.getElementById("quiz-retry").style.display = "block";
+}
+
+function reiniciarQuiz() {
+    document.querySelectorAll('.option').forEach(opt => {
+        opt.classList.remove("selected");
+        opt.style = "";
+    });
+
+    document.getElementById("quiz-result").style.display = "none";
+    document.getElementById("quiz-retry").style.display = "none";
+}
+</script>
+
+     
     
 </body>
 </html>
