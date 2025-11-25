@@ -1787,55 +1787,7 @@ var blueIcon = L.icon({
 
 
        
-<script>
-document.querySelectorAll('.option').forEach(opt => {
-    opt.addEventListener('click', function() {
-        const siblings = this.parentNode.querySelectorAll('.option');
-        siblings.forEach(s => s.classList.remove('selected'));
-        this.classList.add('selected');
-    });
-});
-       
-function calcularResultado() {
-    let score = 0;
-    const questions = document.querySelectorAll('.question');
 
-    questions.forEach(q => {
-        const correctAns = q.getAttribute('data-correct');
-        const selected = q.querySelector('.option.selected');
-
-        if (selected) {
-            if (selected.textContent.trim().startsWith(correctAns)) {
-                score += 10;
-                selected.style.background = '#16a34a44';
-                selected.style.border = '1px solid #22c55e';
-            } else {
-                selected.style.background = '#dc262644';
-                selected.style.border = '1px solid #ef4444';
-            }
-        }
-    });
-       
-
-    const result = document.getElementById("quiz-result");
-    result.style.display = "block";
-    result.innerHTML = `<h3>Puntaje obtenido: <span style="color:#38bdf8">${score} / 50</span></h3>`;
-
-    document.getElementById("quiz-retry").style.display = "block";
-}
-
-function reiniciarQuiz() {
-    document.querySelectorAll('.option').forEach(opt => {
-        opt.classList.remove("selected");
-        opt.style = "";
-    });
-
-    document.getElementById("quiz-result").style.display = "none";
-    document.getElementById("quiz-retry").style.display = "none";
-}
-</script>
-
-     
     
 </body>
 </html>
