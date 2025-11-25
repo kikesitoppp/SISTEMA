@@ -16,7 +16,6 @@
             padding: 0;
             box-sizing: border-box;
         }
-
         body {
             font-family: 'Inter', sans-serif;
             background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
@@ -24,13 +23,11 @@
             height: 100vh;
             overflow: hidden;
         }
-
         .app-container {
             display: flex;
             height: 100vh;
             position: relative;
         }
-
         /* Sidebar Styles */
         .sidebar {
             width: 280px;
@@ -41,20 +38,17 @@
             box-shadow: 4px 0 20px rgba(0, 0, 0, 0.3);
             transition: all 0.3s ease;
         }
-
         .sidebar-header {
             padding: 0 20px 20px;
             border-bottom: 1px solid rgba(255, 255, 255, 0.1);
             margin-bottom: 20px;
         }
-
         .sidebar-header h1 {
             font-size: 1.1rem;
             font-weight: 600;
             color: white;
             line-height: 1.4;
         }
-
         .menu-item {
             display: flex;
             align-items: center;
@@ -65,27 +59,22 @@
             transition: all 0.3s ease;
             color: rgba(255, 255, 255, 0.9);
         }
-
         .menu-item:hover {
             background: rgba(255, 255, 255, 0.1);
         }
-
         .menu-item.active {
             background: rgba(255, 255, 255, 0.2);
             color: white;
         }
-
         .menu-item i {
             width: 24px;
             margin-right: 12px;
             font-size: 1.1rem;
         }
-
         .menu-item span {
             font-size: 0.95rem;
             font-weight: 500;
         }
-
         /* Mobile Menu */
         .mobile-menu-btn {
             display: none;
@@ -101,7 +90,6 @@
             box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
             z-index: 1000;
         }
-
         /* Main Content Styles */
         .main-content {
             flex: 1;
@@ -109,28 +97,23 @@
             flex-direction: column;
             height: 100vh;
         }
-
         .content-area {
             flex: 1;
             padding: 30px;
             overflow-y: auto;
             position: relative;
         }
-
         .content-section {
             display: none;
             animation: fadeIn 0.5s ease;
         }
-
         .content-section.active {
             display: block;
         }
-
         @keyframes fadeIn {
             from { opacity: 0; transform: translateY(20px); }
             to { opacity: 1; transform: translateY(0); }
         }
-
         /* Quality Banner */
         .quality-banner {
             background: linear-gradient(90deg, #065f46, #047857);
@@ -141,7 +124,6 @@
             color: white;
             border-top: 1px solid rgba(255, 255, 255, 0.1);
         }
-
         /* Portada Styles */
         .portada {
             height: 100%;
@@ -156,8 +138,8 @@
                 url('https://a0.cdnfan.com/images/M/6/4/4/2/ruta-en-barco-coche-chino-2_hd_159723.jpg');
             background-size: cover;
             background-position: center;
+            background-attachment: fixed; /* Esto hace que la imagen cubra toda la pantalla */
         }
-
         .portada h1 {
             font-size: 2.5rem;
             font-weight: 700;
@@ -169,7 +151,6 @@
             line-height: 1.3;
             max-width: 1000px;
         }
-
         .portada p {
             font-size: 1.2rem;
             color: #cbd5e1;
@@ -178,15 +159,13 @@
             line-height: 1.6;
             text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
         }
-
         /* Fase 1 Styles */
         .fase1-container {
             display: grid;
-            grid-template-columns: 2fr 1fr;
+            grid-template-columns: 1fr; /* Cambiado a 1 columna para eliminar el panel derecho */
             gap: 30px;
             height: 100%;
         }
-
         .fase1-content {
             background: rgba(30, 41, 59, 0.7);
             border: 1px solid rgba(100, 116, 139, 0.3);
@@ -194,7 +173,6 @@
             padding: 30px;
             backdrop-filter: blur(10px);
         }
-
         .fase1-content h2 {
             font-size: 2rem;
             margin-bottom: 25px;
@@ -203,88 +181,18 @@
             align-items: center;
             gap: 15px;
         }
-
         .fase1-content h2 i {
             background: linear-gradient(45deg, #3b82f6, #10b981);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
         }
-
         .fase1-content p {
             font-size: 1.1rem;
             line-height: 1.7;
             color: #cbd5e1;
             margin-bottom: 20px;
         }
-
-        .cards-container {
-            display: flex;
-            flex-direction: column;
-            gap: 20px;
-        }
-
-        .card {
-            background: rgba(15, 23, 42, 0.7);
-            border: 1px solid rgba(100, 116, 139, 0.3);
-            border-radius: 12px;
-            padding: 25px;
-            transition: all 0.3s ease;
-        }
-
-        .card:hover {
-            transform: translateY(-5px);
-            border-color: rgba(59, 130, 246, 0.5);
-            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.3);
-        }
-
-        .card-header {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            margin-bottom: 20px;
-        }
-
-        .card-icon {
-            font-size: 2rem;
-            background: linear-gradient(45deg, #3b82f6, #10b981);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-
-        .card-title {
-            font-size: 1.3rem;
-            font-weight: 600;
-            color: #f1f5f9;
-        }
-
-        .card-content {
-            color: #94a3b8;
-            line-height: 1.6;
-            margin-bottom: 20px;
-        }
-
-        .card-button {
-            background: linear-gradient(45deg, #065f46, #047857);
-            color: white;
-            border: none;
-            padding: 12px 20px;
-            border-radius: 8px;
-            font-weight: 500;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .card-button:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
-        }
-
-        /* Video Container */
         .video-container {
             position: relative;
             padding-bottom: 56.25%;
@@ -294,7 +202,6 @@
             margin: 30px 0;
             background: #000;
         }
-
         .video-container iframe {
             position: absolute;
             top: 0;
@@ -302,7 +209,6 @@
             width: 100%;
             height: 100%;
         }
-
         /* Quiz Styles */
         .quiz-container {
             background: rgba(15, 23, 42, 0.7);
@@ -311,42 +217,83 @@
             padding: 30px;
             margin-top: 30px;
         }
-
         .question {
             margin-bottom: 25px;
         }
-
         .question h4 {
             margin-bottom: 15px;
             color: #f1f5f9;
             font-size: 1.1rem;
         }
-
-            .option {
-                padding: 8px;
-                margin: 4px;
-                border-radius: 8px;
-                border: 1px solid transparent;
-                cursor: pointer;
-                transition: 0.3s;
-            }
-            
-            .option:hover {
-                background: rgba(255,255,255,0.08);
-            }
-            
-            .option.selected {
-                background: #0ea5e944;
-                border: 1px solid #38bdf8;
-            }
-
+        .options {
+            display: grid;
+            gap: 12px;
+        }
+        .option {
+            padding: 15px 20px;
+            background: rgba(30, 41, 59, 0.5);
+            border: 1px solid rgba(100, 116, 139, 0.3);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            color: #cbd5e1;
+        }
+        .option:hover {
+            background: rgba(59, 130, 246, 0.2);
+            border-color: rgba(59, 130, 246, 0.5);
+        }
+        .option.selected {
+            background: rgba(59, 130, 246, 0.3);
+            border-color: rgba(59, 130, 246, 0.7);
+        }
+        .option.correct {
+            background: rgba(16, 185, 129, 0.3);
+            border-color: rgba(16, 185, 129, 0.7);
+        }
+        .option.incorrect {
+            background: rgba(239, 68, 68, 0.3);
+            border-color: rgba(239, 68, 68, 0.7);
+        }
+        .quiz-result {
+            margin-top: 30px;
+            padding: 20px;
+            background: rgba(15, 23, 42, 0.7);
+            border: 1px solid rgba(100, 116, 139, 0.3);
+            border-radius: 16px;
+            text-align: center;
+            display: none;
+        }
+        .quiz-result h3 {
+            font-size: 1.5rem;
+            color: #f1f5f9;
+            margin-bottom: 15px;
+        }
+        .quiz-result .score {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: #10b981;
+            margin: 20px 0;
+        }
+        .quiz-result button {
+            background: linear-gradient(45deg, #065f46, #047857);
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 8px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .quiz-result button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+        }
         /* Fase 2 Styles - Mapa Interactivo */
         .fase2-full-container {
             height: 100%;
             display: flex;
             flex-direction: column;
         }
-
         .fase2-header {
             background: rgba(30, 41, 59, 0.7);
             border: 1px solid rgba(100, 116, 139, 0.3);
@@ -355,7 +302,6 @@
             margin-bottom: 20px;
             backdrop-filter: blur(10px);
         }
-
         .fase2-header h2 {
             font-size: 2rem;
             color: #f1f5f9;
@@ -364,19 +310,16 @@
             gap: 15px;
             margin-bottom: 10px;
         }
-
         .fase2-header h2 i {
             background: linear-gradient(45deg, #3b82f6, #10b981);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
         }
-
         .fase2-header p {
             color: #cbd5e1;
             font-size: 1.1rem;
         }
-
         .fase2-container {
             display: grid;
             grid-template-columns: 350px 1fr;
@@ -384,7 +327,6 @@
             flex: 1;
             min-height: 0;
         }
-
         .product-sidebar {
             background: rgba(30, 41, 59, 0.7);
             border: 1px solid rgba(100, 116, 139, 0.3);
@@ -393,13 +335,11 @@
             backdrop-filter: blur(10px);
             overflow-y: auto;
         }
-
         .product-sidebar h3 {
             font-size: 1.5rem;
             margin-bottom: 20px;
             color: #f1f5f9;
         }
-
         .product-btn {
             width: 100%;
             padding: 15px;
@@ -413,30 +353,25 @@
             text-align: left;
             color: #cbd5e1;
         }
-
         .product-btn:hover {
             background: rgba(59, 130, 246, 0.2);
             border-color: rgba(59, 130, 246, 0.5);
             transform: translateX(5px);
         }
-
         .product-btn.active {
             background: linear-gradient(135deg, #3b82f6, #10b981);
             color: white;
             border-color: transparent;
         }
-
         .product-name {
             font-weight: bold;
             font-size: 1.1em;
             margin-bottom: 5px;
         }
-
         .product-origin {
             font-size: 0.9em;
             opacity: 0.8;
         }
-
         .map-area {
             background: rgba(30, 41, 59, 0.7);
             border: 1px solid rgba(100, 116, 139, 0.3);
@@ -446,13 +381,11 @@
             display: flex;
             flex-direction: column;
         }
-
         #map {
             flex: 1;
             border-radius: 12px;
             min-height: 400px;
         }
-
         .route-info {
             background: rgba(15, 23, 42, 0.7);
             border: 1px solid rgba(100, 116, 139, 0.3);
@@ -461,17 +394,14 @@
             margin-top: 15px;
             display: none;
         }
-
         .route-info.active {
             display: block;
         }
-
         .route-info h4 {
             font-size: 1.2rem;
             margin-bottom: 15px;
             color: #f1f5f9;
         }
-
         .route-step {
             display: flex;
             align-items: flex-start;
@@ -481,47 +411,38 @@
             border-radius: 10px;
             background: rgba(30, 41, 59, 0.5);
         }
-
         .route-step.road {
             background: rgba(59, 130, 246, 0.2);
             border-left: 4px solid #3b82f6;
         }
-
         .route-step.sea {
             background: rgba(239, 68, 68, 0.2);
             border-left: 4px solid #ef4444;
         }
-
         .route-step.destination {
             background: rgba(16, 185, 129, 0.2);
             border-left: 4px solid #10b981;
         }
-
         .step-content {
             flex: 1;
         }
-
         .step-title {
             font-weight: bold;
             font-size: 1.1em;
             margin-bottom: 5px;
             color: #f1f5f9;
         }
-
         .step-location {
             color: #cbd5e1;
             margin-bottom: 5px;
         }
-
         .step-distance {
             font-size: 0.9em;
             color: #94a3b8;
         }
-
         .leaflet-routing-container {
             display: none;
         }
-
         /* Fase 3 Styles */
         .fase3-container {
             display: grid;
@@ -529,7 +450,6 @@
             gap: 30px;
             height: 100%;
         }
-
         .simulation-area {
             background: rgba(30, 41, 59, 0.7);
             border: 1px solid rgba(100, 116, 139, 0.3);
@@ -537,14 +457,12 @@
             padding: 30px;
             backdrop-filter: blur(10px);
         }
-
         .simulation-header {
             display: flex;
             align-items: center;
             gap: 15px;
             margin-bottom: 25px;
         }
-
         .simulation-header i {
             font-size: 2rem;
             background: linear-gradient(45deg, #3b82f6, #10b981);
@@ -552,16 +470,11 @@
             -webkit-text-fill-color: transparent;
             background-clip: text;
         }
-
-
-
         /* Fase 4 Styles */
-
         /* Para que el mapa NO salga en otras fases */
         .ia-map {
             display: none;
         }
-        
         /* Mostrar SOLO en Fase 4 */
         #fase4 .ia-map {
             display: block;
@@ -570,7 +483,6 @@
             background: rgba(255,255,255,0.03);
             border-radius: 16px;
         }
-
             .content-section {
             display: none;
         }
@@ -581,12 +493,10 @@
             max-width: 800px;
             margin: 0 auto;
         }
-
         .ia-header {
             text-align: center;
             margin-bottom: 30px;
         }
-
         .ia-header h2 {
             font-size: 2rem;
             margin-bottom: 15px;
@@ -596,14 +506,12 @@
             justify-content: center;
             gap: 15px;
         }
-
         .ia-header h2 i {
             background: linear-gradient(45deg, #3b82f6, #10b981);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
         }
-
         .ia-form {
             background: rgba(30, 41, 59, 0.7);
             border: 1px solid rgba(100, 116, 139, 0.3);
@@ -612,13 +520,11 @@
             margin-bottom: 30px;
             backdrop-filter: blur(10px);
         }
-
         .input-group {
             display: flex;
             gap: 15px;
             margin-bottom: 20px;
         }
-
         .input-group input {
             flex: 1;
             padding: 15px 20px;
@@ -628,11 +534,9 @@
             color: #f1f5f9;
             font-size: 1rem;
         }
-
         .input-group input::placeholder {
             color: #94a3b8;
         }
-
         .input-group button {
             padding: 15px 30px;
             background: linear-gradient(45deg, #3b82f6, #10b981);
@@ -643,12 +547,10 @@
             cursor: pointer;
             transition: all 0.3s ease;
         }
-
         .input-group button:hover {
             transform: translateY(-2px);
             box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
         }
-
         .results-container {
             background: rgba(15, 23, 42, 0.7);
             border: 1px solid rgba(100, 116, 139, 0.3);
@@ -657,18 +559,15 @@
             margin-top: 25px;
             display: none;
         }
-
         .result-item {
             display: flex;
             justify-content: space-between;
             padding: 15px 0;
             border-bottom: 1px solid rgba(100, 116, 139, 0.2);
         }
-
         .result-item:last-child {
             border-bottom: none;
         }
-
         .download-btn {
             display: inline-block;
             padding: 12px 25px;
@@ -681,12 +580,10 @@
             transition: all 0.3s ease;
             margin-top: 20px;
         }
-
         .download-btn:hover {
             transform: translateY(-2px);
             box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
         }
-
         .ia-map {
             height: 300px;
             background: linear-gradient(45deg, #1e293b, #0f172a);
@@ -695,7 +592,6 @@
             position: relative;
             overflow: hidden;
         }
-
         /* Responsive Design */
         @media (max-width: 1024px) {
             .fase1-container,
@@ -703,22 +599,18 @@
             .fase3-container {
                 grid-template-columns: 1fr;
             }
-
             .cards-container {
                 flex-direction: row;
                 flex-wrap: wrap;
             }
-
             .card {
                 flex: 1;
                 min-width: 250px;
             }
-
             .kpi-container {
                 grid-template-columns: 1fr;
             }
         }
-
         @media (max-width: 768px) {
             .sidebar {
                 position: fixed;
@@ -726,50 +618,39 @@
                 height: 100vh;
                 z-index: 1000;
             }
-
             .sidebar.active {
                 left: 0;
             }
-
             .mobile-menu-btn {
                 display: block;
             }
-
             .portada h1 {
                 font-size: 1.8rem;
             }
-
             .portada p {
                 font-size: 1rem;
             }
-
             .input-group {
                 flex-direction: column;
             }
-
             .cards-container {
                 flex-direction: column;
             }
-
             .card {
                 min-width: 100%;
             }
         }
-
         @media (max-width: 480px) {
             .content-area {
                 padding: 15px;
             }
-
             .simulation-visual {
                 height: 300px;
             }
-
             .flow-stages {
                 flex-direction: column;
                 gap: 30px;
             }
-
             .flow-arrows {
                 display: none;
             }
@@ -781,7 +662,6 @@
     <button class="mobile-menu-btn" onclick="toggleSidebar()">
         <i class="fas fa-bars"></i>
     </button>
-
     <div class="app-container">
         <!-- Sidebar -->
         <div class="sidebar" id="sidebar">
@@ -809,7 +689,6 @@
                 <span>Fase 4 - IA Predictiva</span>
             </div>
         </div>
-
         <!-- Main Content -->
         <div class="main-content">
             <div class="content-area">
@@ -820,135 +699,79 @@
                         <p>Herramientas digitales para una logística portuaria eficiente, trazable y comprometida con la calidad.</p>
                     </div>
                 </div>
-
                 <!-- Fase 1 Section -->
                 <div class="content-section" id="fase1">
                     <div class="fase1-container">
                         <div class="fase1-content">
                             <h2><i class="fas fa-clipboard-check"></i> Fase 1 - Conceptos y Normas de Calidad</h2>
-                            
                             <p>La logística portuaria es el conjunto de actividades que permiten la recepción, almacenamiento, manipulación y despacho eficiente de mercancías a través de instalaciones portuarias. Involucra coordinación entre múltiples actores como navieras, agentes aduanales, transportistas y autoridades portuarias.</p>
-                            
                             <p>El control de calidad basado en normas ISO garantiza procesos estandarizados, mejora continua y satisfacción del cliente mediante la identificación y gestión sistemática de riesgos operativos.</p>
-                            
                             <div class="video-container">
                                 <iframe src="https://www.youtube.com/embed/Cow8OJ3ZzDU" frameborder="0" allowfullscreen></iframe>
                             </div>
                             <p style="text-align: center; margin-top: 10px; color: #94a3b8;">Calidad en operaciones portuarias: del estándar a la práctica
 </p>
-                            
-                 <div class="quiz-container">
-    <h3>Cuestionario Interactivo</h3>
-
-    <div class="question" data-correct="B">
-        <h4>1. ¿Cuál de las siguientes NO es una función principal de los Sistemas de Información Geográfica (SIG) en logística?</h4>
-        <div class="options">
-            <div class="option">A) Visualizar rutas en mapas digitales</div>
-            <div class="option">B) Generar rutas en tiempo real con ajuste automático ante congestión vial</div>
-            <div class="option">C) Analizar datos espaciales como distancias, pendientes y restricciones de peso</div>
-            <div class="option">D) Integrar bases de datos logísticas con información geográfica</div>
-        </div>
-    </div>
-
-    <div class="question" data-correct="C">
-        <h4>2. ¿Qué componente de un puerto se encarga específicamente de proteger el interior de las olas y corrientes marinas?</h4>
-        <div class="options">
-            <div class="option">A) Dársena de maniobra</div>
-            <div class="option">B) Canal de acceso</div>
-            <div class="option">C) Diques de abrigo (rompeolas)</div>
-            <div class="option">D) Plataforma portuaria</div>
-        </div>
-    </div>
-
-    <div class="question" data-correct="C">
-        <h4>3. ¿Qué tipo de software logístico utiliza algoritmos del TSP y VRP para optimizar entregas?</h4>
-        <div class="options">
-            <div class="option">A) Sistemas de Gestión de Transporte (TMS)</div>
-            <div class="option">B) Plataformas de navegación como Waze</div>
-            <div class="option">C) Software de Optimización de Rutas Logísticas</div>
-            <div class="option">D) Aplicaciones de telemetría vehicular</div>
-        </div>
-    </div>
-
-    <div class="question" data-correct="C">
-        <h4>4. ¿En qué zona portuaria se almacenan temporalmente los contenedores?</h4>
-        <div class="options">
-            <div class="option">A) Almacenes aduaneros</div>
-            <div class="option">B) Plataforma portuaria</div>
-            <div class="option">C) Patios de contenedores</div>
-            <div class="option">D) Terminales Ro-Ro</div>
-        </div>
-    </div>
-
-    <div class="question" data-correct="B">
-        <h4>5. ¿Cuál de las siguientes herramientas permite simular escenarios logísticos?</h4>
-        <div class="options">
-            <div class="option">A) Google Maps API</div>
-            <div class="option">B) FlexSim</div>
-            <div class="option">C) Onfleet</div>
-            <div class="option">D) Geotab</div>
-        </div>
-    </div>
-
-    <button class="quiz-submit" onclick="calcularResultado()">Enviar respuestas</button>
-
-    <div id="quiz-result" style="display:none; margin-top:20px;"></div>
-    <button id="quiz-retry" style="display:none; margin-top:15px;" onclick="reiniciarQuiz()">Volver a intentar</button>
-</div>
-
-
-                        <div class="cards-container">
-                            <div class="card">
-                                <div class="card-header">
-                                    <div class="card-icon">
-                                        <i class="fas fa-ship"></i>
+                            <div class="quiz-container">
+                                <h3>Cuestionario Interactivo</h3>
+                                <div class="question">
+                                    <h4>1. ¿Cuál de las siguientes NO es una función principal de los Sistemas de Información Geográfica (SIG) en logística?</h4>
+                                    <div class="options">
+                                        <div class="option" onclick="selectOption(this, 'A')">A) Visualizar rutas en mapas digitales</div>
+                                        <div class="option" onclick="selectOption(this, 'B')">B) Generar rutas en tiempo real con ajuste automático ante congestión vial</div>
+                                        <div class="option" onclick="selectOption(this, 'C')">C) Analizar datos espaciales como distancias, pendientes y restricciones de peso</div>
+                                        <div class="option" onclick="selectOption(this, 'D')">D) Integrar bases de datos logísticas con información geográfica</div>
                                     </div>
-                                    <div class="card-title">Puerto</div>
                                 </div>
-                                <div class="card-content">
-                                    <p>Vista previa de imágenes reales del Puerto de Guayaquil con grúas, contenedores y buques comerciales.</p>
-                                </div>
-                                <button class="card-button" onclick="abrirPDF('Puerto.pdf')">
-                                    <i class="fas fa-file-pdf"></i>
-                                    Ver PDF / Imágenes
-                                </button>
-                            </div>
-
-                            <div class="card">
-                                <div class="card-header">
-                                    <div class="card-icon">
-                                        <i class="fas fa-certificate"></i>
+                                <div class="question">
+                                    <h4>2. ¿Qué componente de un puerto se encarga específicamente de proteger el interior de las olas y corrientes marinas?</h4>
+                                    <div class="options">
+                                        <div class="option" onclick="selectOption(this, 'A')">A) Dársena de maniobra</div>
+                                        <div class="option" onclick="selectOption(this, 'B')">B) Canal de acceso</div>
+                                        <div class="option" onclick="selectOption(this, 'C')">C) Diques de abrigo (rompeolas)</div>
+                                        <div class="option" onclick="selectOption(this, 'D')">D) Plataforma portuaria</div>
                                     </div>
-                                    <div class="card-title">Normas de Calidad</div>
                                 </div>
-                                <div class="card-content">
-                                    <p>ISO 9001 (Calidad), ISO 14001 (Ambiental), ISO 28000 (Seguridad), ISO 45001 (Salud Ocupacional).</p>
-                                </div>
-                                <button class="card-button" onclick="abrirPDF('Normas.pdf')">
-                                    <i class="fas fa-file-pdf"></i>
-                                    Ver PDF — Normas
-                                </button>
-                            </div>
-
-                            <div class="card">
-                                <div class="card-header">
-                                    <div class="card-icon">
-                                        <i class="fas fa-tools"></i>
+                                <div class="question">
+                                    <h4>3. ¿Qué tipo de software logístico utiliza algoritmos del Problema del Viajante (TSP) y del Problema de Ruteo de Vehículos (VRP) para optimizar entregas?</h4>
+                                    <div class="options">
+                                        <div class="option" onclick="selectOption(this, 'A')">A) Sistemas de Gestión de Transporte (TMS)</div>
+                                        <div class="option" onclick="selectOption(this, 'B')">B) Plataformas de navegación como Waze</div>
+                                        <div class="option" onclick="selectOption(this, 'C')">C) Software de Optimización de Rutas Logísticas</div>
+                                        <div class="option" onclick="selectOption(this, 'D')">D) Aplicaciones de telemetría vehicular</div>
                                     </div>
-                                    <div class="card-title">Herramientas Digitales</div>
                                 </div>
-                                <div class="card-content">
-                                    <p>FlexSim (simulación), ArcGIS (mapas), herramientas de modelado y monitoreo en tiempo real.</p>
+                                <div class="question">
+                                    <h4>4. ¿En qué zona portuaria se almacenan temporalmente los contenedores antes de su transporte terrestre o marítimo?</h4>
+                                    <div class="options">
+                                        <div class="option" onclick="selectOption(this, 'A')">A) Almacenes aduaneros</div>
+                                        <div class="option" onclick="selectOption(this, 'B')">B) Plataforma portuaria</div>
+                                        <div class="option" onclick="selectOption(this, 'C')">C) Patios de contenedores</div>
+                                        <div class="option" onclick="selectOption(this, 'D')">D) Terminales Ro-Ro</div>
+                                    </div>
                                 </div>
-                                <button class="card-button" onclick="abrirPDF('Herramientas.pdf')">
-                                    <i class="fas fa-file-pdf"></i>
-                                    Ver PDF — Herramientas
+                                <div class="question">
+                                    <h4>5. ¿Cuál de las siguientes herramientas permite simular escenarios logísticos como demanda, tráfico y tiempos de carga antes de implementarlos en la realidad?</h4>
+                                    <div class="options">
+                                        <div class="option" onclick="selectOption(this, 'A')">A) Google Maps API</div>
+                                        <div class="option" onclick="selectOption(this, 'B')">B) FlexSim</div>
+                                        <div class="option" onclick="selectOption(this, 'C')">C) Onfleet</div>
+                                        <div class="option" onclick="selectOption(this, 'D')">D) Geotab</div>
+                                    </div>
+                                </div>
+                                <button class="card-button" onclick="submitQuiz()" style="margin-top: 20px;">
+                                    <i class="fas fa-check-circle"></i>
+                                    Enviar Respuestas
                                 </button>
+                                <div class="quiz-result" id="quizResult">
+                                    <h3>Tu Calificación</h3>
+                                    <div class="score" id="score">0 / 10</div>
+                                    <p id="feedback">¡Bien hecho!</p>
+                                    <button onclick="resetQuiz()">Volver a Intentar</button>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
-
                 <!-- Fase 2 Section - Mapa Interactivo -->
                 <div class="content-section" id="fase2">
                     <div class="fase2-full-container">
@@ -956,13 +779,11 @@
                             <h2><i class="fas fa-map-marked-alt"></i> Rastreador de Rutas de Productos Ecuatorianos</h2>
                             <p>Rutas marítimas 100% por océano</p>
                         </div>
-
                         <div class="fase2-container">
                             <div class="product-sidebar">
                                 <h3>Productos de Exportación</h3>
                                 <div id="productList"></div>
                             </div>
-
                             <div class="map-area">
                                 <div id="map"></div>
                                 <div id="routeInfo" class="route-info">
@@ -973,41 +794,34 @@
                         </div>
                     </div>
                 </div>
-
 <!-- Fase 3 Section -->
 <div class="content-section" id="fase3">
     <div class="fase3-container">
-
         <div class="simulation-area">
-
             <div class="simulation-header">
                 <i class="fas fa-project-diagram"></i>
                 <h2>Simulación del Flujo de Contenedores</h2>
             </div>
-
-            <!-- VIDEO DEL MODELO FLEXSIM -->
+            <!-- NUEVO CONTENEDOR DEL VIDEO -->
             <div class="video-container" style="margin-top: 20px;">
                 <video controls style="width:100%; border-radius:12px;">
                     <source src="video1.mp4" type="video/mp4">
                     Tu navegador no soporta reproducción de video.
                 </video>
             </div>
-
         </div>
-
+        <!-- Eliminamos el panel derecho (info-panel) 
+             pero mantenemos un contenedor vacío
+             para que no se rompa el grid -->
         <div></div>
-
     </div>
-</div> 
-                
+</div>
 <!-- Fase 4 Section -->
 <div class="content-section" id="fase4">
-    
     <h2><i class="fas fa-route"></i> Visualización Inteligente de Ruta</h2>
     <p style="color:#cbd5e1; margin-bottom:20px;">
         Análisis predictivo del transporte según el producto seleccionado.
     </p>
-
     <!-- MAPA SOLO EN FASE 4 -->
     <div class="ia-map">
         <svg width="100%" height="260" viewBox="0 0 1000 300">
@@ -1015,29 +829,23 @@
                 stroke="url(#gradient)" 
                 stroke-width="10" 
                 fill="none" />
-
             <defs>
                 <linearGradient id="gradient" x1="0" x2="1" y1="0" y2="0">
                     <stop offset="0%" stop-color="#8b5cf6"/>
                     <stop offset="100%" stop-color="#ec4899"/>
                 </linearGradient>
             </defs>
-
             <circle cx="100" cy="200" r="15" fill="#8b5cf6"></circle>
             <text x="100" y="185" fill="#8b5cf6" font-size="16" text-anchor="middle">Origen</text>
-
             <circle cx="400" cy="120" r="10" fill="#f59e0b"></circle>
             <circle cx="650" cy="230" r="10" fill="#f59e0b"></circle>
-
             <circle cx="900" cy="150" r="15" fill="#ec4899"></circle>
             <text x="900" y="135" fill="#ec4899" font-size="16" text-anchor="middle">Destino</text>
         </svg>
     </div>
-
     <!-- FORMULARIO -->
     <div class="ia-form" style="margin-top:20px;">
         <h3><i class="fas fa-search"></i> Generador de Rutas Inteligentes</h3>
-
         <div class="input-group">
             <input type="text" id="producto-input" placeholder="Ingresa un producto (ej. café, cacao)">
             <button onclick="analizarRuta()">
@@ -1045,11 +853,9 @@
             </button>
         </div>
     </div>
-
     <!-- RESULTADOS -->
     <div class="results-container" id="ia-results" style="margin-top:25px">
         <h4><i class="fas fa-route"></i> Resultados del Análisis</h4>
-
         <div class="result-item"><span class="info-label">Producto:</span> <span class="info-value" id="resultado-producto">-</span></div>
         <div class="result-item"><span class="info-label">Ruta Completa:</span> <span class="info-value" id="resultado-ruta">-</span></div>
         <div class="result-item"><span class="info-label">Transporte Recomendado:</span> <span class="info-value" id="resultado-transporte">-</span></div>
@@ -1058,18 +864,13 @@
         <div class="result-item"><span class="info-label">Emisiones CO₂:</span> <span class="info-value" id="resultado-co2">-</span></div>
         <div class="result-item"><span class="info-label">Nodos Intermedios:</span> <span class="info-value" id="resultado-nodos">-</span></div>
     </div>
-
 </div>
-
-
-
             <!-- Quality Banner -->
             <div class="quality-banner">
                 Comprometidos con la calidad (ISO 9001), la trazabilidad y la sostenibilidad en la logística portuaria.
             </div>
         </div>
     </div>
-
     <script>
         // Products data for Phase 2
         var products = [
@@ -1462,21 +1263,17 @@
                 ]
             }
         ];
-
         var map;
         var selectedProduct = null;
         var markers = [];
         var polylines = [];
         var routingControl = null;
-
         function initMap() {
             map = L.map('map').setView([-1.8, -78.5], 3);
-            
             L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
                 attribution: 'OpenStreetMap'
             }).addTo(map);
         }
-
         function calculateDistance(coord1, coord2) {
             var R = 6371;
             var dLat = (coord2[0] - coord1[0]) * Math.PI / 180;
@@ -1487,7 +1284,6 @@
             var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
             return Math.round(R * c);
         }
-
         function calculateRouteDistance(route) {
             var totalDist = 0;
             for (var i = 0; i < route.length - 1; i++) {
@@ -1495,7 +1291,6 @@
             }
             return totalDist;
         }
-
         function clearMap() {
             var i;
             for (i = 0; i < markers.length; i++) {
@@ -1511,10 +1306,8 @@
             markers = [];
             polylines = [];
         }
-
         function showRoute(product) {
             clearMap();
-
             var greenIcon = L.icon({
                 iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-green.png',
                 shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
@@ -1523,7 +1316,6 @@
                 popupAnchor: [1, -34],
                 shadowSize: [41, 41]
             });
-
             var originMarker = L.marker(product.coords.origin, {icon: greenIcon}).addTo(map);
             originMarker.bindPopup('<b>Zona de Producción</b><br>' + product.origin);
             markers.push(originMarker);
@@ -1535,11 +1327,9 @@ var blueIcon = L.icon({
                 popupAnchor: [1, -34],
                 shadowSize: [41, 41]
             });
-
             var originPortMarker = L.marker(product.coords.originPort, {icon: blueIcon}).addTo(map);
             originPortMarker.bindPopup('<b>Puerto de Origen</b><br>' + product.originPort);
             markers.push(originPortMarker);
-
             var redIcon = L.icon({
                 iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-red.png',
                 shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
@@ -1548,11 +1338,9 @@ var blueIcon = L.icon({
                 popupAnchor: [1, -34],
                 shadowSize: [41, 41]
             });
-
             var destMarker = L.marker(product.coords.destPort, {icon: redIcon}).addTo(map);
             destMarker.bindPopup('<b>Puerto de Destino</b><br>' + product.destPort);
             markers.push(destMarker);
-
             try {
                 routingControl = L.Routing.control({
                     waypoints: [
@@ -1572,14 +1360,12 @@ var blueIcon = L.icon({
             } catch(e) {
                 console.log('Error en routing:', e);
             }
-
             var seaLine = L.polyline(product.seaRoute, {
                 color: '#ef4444',
                 weight: 5,
                 opacity: 0.85
             }).addTo(map);
             polylines.push(seaLine);
-
             setTimeout(function() {
                 var allCoords = [product.coords.origin, product.coords.originPort, product.coords.destPort];
                 for (var i = 0; i < product.seaRoute.length; i++) {
@@ -1588,15 +1374,12 @@ var blueIcon = L.icon({
                 var bounds = L.latLngBounds(allCoords);
                 map.fitBounds(bounds, { padding: [50, 50] });
             }, 1000);
-
             var roadDist = calculateDistance(product.coords.origin, product.coords.originPort);
             var seaDist = calculateRouteDistance(product.seaRoute);
             showRouteInfo(product, roadDist, seaDist);
         }
-
         function showRouteInfo(product, roadDist, seaDist) {
             var totalDist = roadDist + seaDist;
-            
             var usesCanal = false;
             for (var i = 0; i < product.seaRoute.length; i++) {
                 if (product.seaRoute[i][0] >= 8 && product.seaRoute[i][0] <= 10 && 
@@ -1605,7 +1388,6 @@ var blueIcon = L.icon({
                     break;
                 }
             }
-
             var html = '<div class="route-step road">' +
                 '<div class="step-content">' +
                 '<div class="step-title">Ruta Terrestre (Azul)</div>' +
@@ -1613,7 +1395,6 @@ var blueIcon = L.icon({
                 '<div class="step-location">Hasta: ' + product.originPort + '</div>' +
                 '<div class="step-distance">Distancia por carretera: ~' + roadDist.toLocaleString() + ' km</div>' +
                 '</div></div>' +
-                
                 '<div class="route-step sea">' +
                 '<div class="step-content">' +
                 '<div class="step-title">Ruta Marítima (Rojo)' + (usesCanal ? ' - Vía Canal de Panamá' : ' - Vía Pacífico') + '</div>' +
@@ -1621,28 +1402,23 @@ var blueIcon = L.icon({
                 '<div class="step-location">Hasta: ' + product.destPort + '</div>' +
                 '<div class="step-distance">Distancia marítima: ~' + seaDist.toLocaleString() + ' km</div>' +
                 '</div></div>' +
-                
                 '<div class="route-step destination">' +
                 '<div class="step-content">' +
                 '<div class="step-title">Puerto Final</div>' +
                 '<div class="step-location">' + product.destPort + '</div>' +
                 '<div class="step-distance">Destino final del producto</div>' +
                 '</div></div>' +
-                
                 '<div class="route-step" style="background: linear-gradient(135deg, #3b82f6 0%, #10b981 100%); color: white; border-left: none;">' +
                 '<div class="step-content">' +
                 '<div class="step-title">Distancia Total</div>' +
                 '<div class="step-location" style="color: white;">' + totalDist.toLocaleString() + ' km aproximadamente</div>' +
                 '</div></div>';
-
             document.getElementById('routeSteps').innerHTML = html;
             document.getElementById('routeInfo').classList.add('active');
         }
-
         function renderProductList() {
             var listEl = document.getElementById('productList');
             var html = '';
-            
             for (var i = 0; i < products.length; i++) {
                 var product = products[i];
                 html += '<button class="product-btn" onclick="selectProduct(' + product.id + ')">' +
@@ -1650,10 +1426,8 @@ var blueIcon = L.icon({
                     '<div class="product-origin">' + product.origin + '</div>' +
                     '</button>';
             }
-            
             listEl.innerHTML = html;
         }
-
         function selectProduct(id) {
             for (var i = 0; i < products.length; i++) {
                 if (products[i].id === id) {
@@ -1661,7 +1435,6 @@ var blueIcon = L.icon({
                     break;
                 }
             }
-            
             var buttons = document.querySelectorAll('.product-btn');
             for (var i = 0; i < buttons.length; i++) {
                 if (products[i].id === id) {
@@ -1670,31 +1443,25 @@ var blueIcon = L.icon({
                     buttons[i].classList.remove('active');
                 }
             }
-
             showRoute(selectedProduct);
         }
-
         // Navigation
         function showSection(sectionId) {
             // Hide all sections
             document.querySelectorAll('.content-section').forEach(section => {
                 section.classList.remove('active');
             });
-            
             // Show selected section
             document.getElementById(sectionId).classList.add('active');
-            
             // Update menu active state
             document.querySelectorAll('.menu-item').forEach(item => {
                 item.classList.remove('active');
             });
-            
             // Find and activate the corresponding menu item
             const menuItem = document.querySelector(`[data-section="${sectionId}"]`);
             if (menuItem) {
                 menuItem.classList.add('active');
             }
-            
             // Initialize map if fase2 is selected
             if (sectionId === 'fase2' && !map) {
                 setTimeout(function() {
@@ -1702,13 +1469,11 @@ var blueIcon = L.icon({
                     renderProductList();
                 }, 100);
             }
-            
             // Close sidebar on mobile after selection
             if (window.innerWidth <= 768) {
                 document.getElementById('sidebar').classList.remove('active');
             }
         }
-
         // Menu click handlers
         document.querySelectorAll('.menu-item').forEach(item => {
             item.addEventListener('click', () => {
@@ -1716,18 +1481,108 @@ var blueIcon = L.icon({
                 showSection(sectionId);
             });
         });
-
         // Mobile sidebar toggle
         function toggleSidebar() {
             const sidebar = document.getElementById('sidebar');
             sidebar.classList.toggle('active');
         }
 
+        // QUIZ FUNCTIONALITY
+        let userAnswers = {};
+        const correctAnswers = {
+            1: 'B',
+            2: 'C',
+            3: 'C',
+            4: 'C',
+            5: 'B'
+        };
+
+        function selectOption(optionElement, answer) {
+            // Remove selected class from all options in this question
+            const question = optionElement.closest('.question');
+            const options = question.querySelectorAll('.option');
+            options.forEach(opt => opt.classList.remove('selected'));
+
+            // Add selected class to clicked option
+            optionElement.classList.add('selected');
+
+            // Store user's answer
+            const questionIndex = Array.from(question.parentNode.children).indexOf(question) + 1;
+            userAnswers[questionIndex] = answer;
+        }
+
+        function submitQuiz() {
+            let score = 0;
+            const questions = document.querySelectorAll('.question');
+            
+            questions.forEach((question, index) => {
+                const questionNumber = index + 1;
+                const selectedOption = question.querySelector('.option.selected');
+                const correctOption = question.querySelector(`.option:nth-child(${getCorrectOptionIndex(correctAnswers[questionNumber])})`);
+                
+                if (selectedOption) {
+                    const userAnswer = userAnswers[questionNumber];
+                    if (userAnswer === correctAnswers[questionNumber]) {
+                        score += 2; // 2 points per correct answer (total 10)
+                        selectedOption.classList.add('correct');
+                    } else {
+                        selectedOption.classList.add('incorrect');
+                        correctOption.classList.add('correct');
+                    }
+                } else {
+                    // If no answer selected, mark correct answer
+                    correctOption.classList.add('correct');
+                }
+            });
+
+            // Show result
+            const quizResult = document.getElementById('quizResult');
+            const scoreElement = document.getElementById('score');
+            const feedbackElement = document.getElementById('feedback');
+            
+            scoreElement.textContent = `${score} / 10`;
+            
+            if (score >= 8) {
+                feedbackElement.textContent = "¡Excelente! Has demostrado un gran conocimiento.";
+            } else if (score >= 6) {
+                feedbackElement.textContent = "¡Bien hecho! Tienes buenos conocimientos, pero hay espacio para mejorar.";
+            } else {
+                feedbackElement.textContent = "Necesitas repasar más. ¡Sigue intentándolo!";
+            }
+            
+            quizResult.style.display = 'block';
+            
+            // Scroll to result
+            quizResult.scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function getCorrectOptionIndex(answer) {
+            switch(answer) {
+                case 'A': return 1;
+                case 'B': return 2;
+                case 'C': return 3;
+                case 'D': return 4;
+                default: return 1;
+            }
+        }
+
+        function resetQuiz() {
+            // Reset all options
+            document.querySelectorAll('.option').forEach(option => {
+                option.classList.remove('selected', 'correct', 'incorrect');
+            });
+            
+            // Reset user answers
+            userAnswers = {};
+            
+            // Hide result
+            document.getElementById('quizResult').style.display = 'none';
+        }
+
         // IA Analysis for Phase 4
         function analizarRuta() {
             const producto = document.getElementById('producto-input').value || 'Cacao';
             const resultados = document.getElementById('ia-results');
-            
             // Update result values
             document.getElementById('resultado-producto').textContent = producto;
             document.getElementById('resultado-ruta').textContent = 'Guayaquil → Rotterdam (Holanda)';
@@ -1736,15 +1591,18 @@ var blueIcon = L.icon({
             document.getElementById('resultado-distancia').textContent = '9,850 km';
             document.getElementById('resultado-co2').textContent = '12.4 toneladas';
             document.getElementById('resultado-nodos').textContent = 'Puerto Balao, Panamá, Cartagena';
-            
             // Show results
             resultados.style.display = 'block';
-            
             // Scroll to results
             resultados.scrollIntoView({ behavior: 'smooth' });
         }
-
-
+        // Card button functionality
+        document.querySelectorAll('.card-button').forEach(button => {
+            button.addEventListener('click', function() {
+                const cardTitle = this.closest('.card').querySelector('.card-title').textContent;
+                alert(`Descargando documento PDF: ${cardTitle}...`);
+            });
+        });
         // Download PDF functionality
         document.addEventListener('DOMContentLoaded', function() {
             const downloadBtn = document.querySelector('.download-btn');
@@ -1754,14 +1612,12 @@ var blueIcon = L.icon({
                 });
             }
         });
-
         // Initialize
         document.addEventListener('DOMContentLoaded', function() {
             // Close sidebar when clicking outside on mobile
             document.addEventListener('click', function(event) {
                 const sidebar = document.getElementById('sidebar');
                 const menuBtn = document.querySelector('.mobile-menu-btn');
-                
                 if (window.innerWidth <= 768 && 
                     sidebar.classList.contains('active') && 
                     !sidebar.contains(event.target) && 
@@ -1770,24 +1626,6 @@ var blueIcon = L.icon({
                 }
             });
         });
-
-        function abrirPDF(nombrePDF) {
-    const url = nombrePDF;
-
-    const link = document.createElement('a');
-    link.href = url;
-    link.target = "_blank";
-    link.rel = "noopener";
-
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-}
     </script>
-
-
-       
-
-    
 </body>
 </html>
