@@ -1821,45 +1821,67 @@
             alert(`Simulación de descarga/visualización del archivo: ${nombrePDF}`);
         }
 
-        function generarPDFdeIA() {
+function generarPDFdeIA() {
     const { jsPDF } = window.jspdf;
-    const doc = new jsPDF();
+    const doc = new jsPDF({ unit: "mm", format: "a4" });
+    
+    const margenX = 12;
+    let y = 15;
+    const maxWidth = 180; // controla el ancho del texto
 
+    // Título
     doc.setFont("helvetica", "bold");
     doc.setFontSize(18);
-    doc.text("Informe Predictivo de Logística Internacional", 10, 15);
+    doc.text("Informe Predictivo de Logística Internacional", margenX, y);
+    y += 10;
 
-    doc.setFontSize(12);
+    // Descripción
+    doc.setFontSize(11);
     doc.setFont("helvetica", "normal");
-    doc.text("Este informe ha sido generado mediante análisis inteligente de la imagen de la ruta y deducción del modelo IA.", 10, 25);
+    let intro = "Este informe ha sido generado mediante análisis inteligente de la imagen de la ruta y deducción del modelo IA.";
+    let introLines = doc.splitTextToSize(intro, maxWidth);
+    doc.text(introLines, margenX, y);
+    y += introLines.length * 6;
 
-    doc.text("----------------------------------------------------", 10, 30);
+    doc.text("————————————————————————————————————", margenX, y);
+    y += 8;
 
-    doc.text("Resultado General:", 10, 40);
-    doc.text(document.getElementById('resultado-general').textContent, 10, 47);
 
-    doc.text("Origen:", 10, 60);
-    doc.text(document.getElementById('resultado-origen').textContent, 10, 67);
+    function agregarCampo(titulo, valor) {
+        doc.setFont("helvetica", "bold");
+        doc.text(titulo, margenX, y);
+        y += 6;
 
-    doc.text("Destino:", 10, 80);
-    doc.text(document.getElementById('resultado-destino').textContent, 10, 87);
+        doc.setFont("helvetica", "normal");
+        let lineas = doc.splitTextToSize(valor, maxWidth);
+        doc.text(lineas, margenX, y);
+        y += lineas.length * 6 + 4;
+    }
 
-    doc.text("Tiempo Estimado:", 10, 100);
-    doc.text(document.getElementById('resultado-tiempo').textContent, 10, 107);
+    agregarCampo("Resultado General:", document.getElementById('resultado-general').textContent);
+    agregarCampo("Origen:", document.getElementById('resultado-origen').textContent);
+    agregarCampo("Destino:", document.getElementById('resultado-destino').textContent);
+    agregarCampo("Tiempo Estimado:", document.getElementById('resultado-tiempo').textContent);
+    agregarCampo("Tipo de Carga:", document.getElementById('resultado-carga').textContent);
+    agregarCampo("Resumen Final:", document.getElementById('resultado-resumen').textContent);
 
-    doc.text("Tipo de Carga:", 10, 120);
-    doc.text(document.getElementById('resultado-carga').textContent, 10, 127);
+    doc.setFont("helvetica", "bold");
+    doc.text("Riesgos y recomendaciones:", margenX, y);
+    y += 6;
 
-    doc.text("Resumen Final:", 10, 140);
-    doc.text(document.getElementById('resultado-resumen').textContent, 10, 147);
-
-    doc.text("Riesgos y recomendaciones:", 10, 165);
-    
+    doc.setFont("helvetica", "normal");
     const riesgos = document.querySelectorAll('#resultado-riesgos li');
-    let y = 172;
+
     riesgos.forEach(r => {
-        doc.text("- " + r.textContent, 10, y);
-        y += 7;
+        let lineas = doc.splitTextToSize("- " + r.textContent, maxWidth);
+        doc.text(lineas, margenX, y);
+        y += lineas.length * 6;
+        
+        // Si llegamos al final de la página, crear otra:
+        if (y > 270) {
+            doc.addPage();
+            y = 20;
+        }
     });
 
     doc.save("informe_logistico.pdf");
