@@ -1,163 +1,1852 @@
-<!-- Fase 4 Section - IA Predictiva -->
-<div class="content-section" id="fase4">
-    <h2><i class="fas fa-robot"></i> Análisis Predictivo de Rutas Logísticas</h2>
-    <p style="color:#cbd5e1; margin-bottom:20px;">
-        Sube una captura de pantalla de la ruta de la Fase 2 para generar su informe logístico.
-    </p>
-    <!-- FORMULARIO PARA SUBIR IMAGEN -->
-    <div class="ia-form" style="margin-top:20px;">
-        <h3><i class="fas fa-image"></i> Subir Captura de Pantalla</h3>
-        <input type="file" id="imagen-captura" accept="image/*" style="padding: 12px 20px; background: rgba(15, 23, 42, 0.5); border: 1px solid rgba(100, 116, 139, 0.3); border-radius: 12px; color: #f1f5f9; font-size: 1rem; width: 100%; margin-bottom: 15px;">
-        <button onclick="analizarImagen()" class="card-button" style="width: 100%;">
-            <i class="fas fa-brain"></i> Analizar Imagen con IA
-        </button>
-    </div>
-    <!-- RESULTADOS DEL ANALISIS -->
-    <div class="results-container" id="ia-results" style="margin-top:25px; display: none;">
-        <h4><i class="fas fa-file-alt"></i> Informe de la Ruta Logística</h4>
-        <div class="result-item"><span class="info-label">Producto:</span> <span class="info-value" id="resultado-producto">-</span></div>
-        <div class="result-item"><span class="info-label">Origen:</span> <span class="info-value" id="resultado-origen">-</span></div>
-        <div class="result-item"><span class="info-label">Destino:</span> <span class="info-value" id="resultado-destino">-</span></div>
-        <div class="result-item"><span class="info-label">Tipo de Transporte:</span> <span class="info-value" id="resultado-transporte">-</span></div>
-        <div class="result-item"><span class="info-label">Distancia Total:</span> <span class="info-value" id="resultado-distancia">-</span></div>
-        <div class="result-item"><span class="info-label">Vía Principal:</span> <span class="info-value" id="resultado-via">-</span></div>
-        <div class="result-item"><span class="info-label">Descripción del Proceso:</span> <span class="info-value" id="resultado-descripcion">-</span></div>
-        <button class="download-btn" onclick="descargarPDF()">
-            <i class="fas fa-file-pdf"></i> Descargar Informe (PDF)
-        </button>
-    </div>
-</div>
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Visualización de rutas logísticas y operaciones portuarias mediante herramientas digitales con enfoque en calidad</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="https://unpkg.com/leaflet-routing-machine@3.2.12/dist/leaflet-routing-machine.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
-<script>
-// === CONFIGURACIÓN DE OPENAI ===
-// ⚠️ PON TU CLAVE AQUÍ ⚠️
-const OPENAI_API_KEY = "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"; // Reemplaza esto con tu clave real de OpenAI
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+            color: #e2e8f0;
+            height: 100vh;
+            overflow: hidden;
+        }
 
-async function analizarImagen() {
-    const input = document.getElementById('imagen-captura');
-    const file = input.files[0];
-    
-    if (!file) {
-        alert("Por favor, selecciona una imagen.");
-        return;
-    }
+        .app-container {
+            display: flex;
+            height: 100vh;
+            position: relative;
+        }
 
-    try {
-        // Mostrar mensaje de carga
-        document.getElementById('ia-results').style.display = 'none';
-        const loadingDiv = document.createElement('div');
-        loadingDiv.style.textAlign = 'center';
-        loadingDiv.innerHTML = '<p style="color: #fbbf24; font-weight: 600;">Analizando la imagen... Esto puede tardar unos segundos.</p>';
-        document.querySelector('.ia-form').after(loadingDiv);
+        /* Sidebar Styles */
+        .sidebar {
+            width: 280px;
+            background: linear-gradient(180deg, #065f46 0%, #047857 100%);
+            padding: 20px 0;
+            z-index: 100;
+            overflow-y: auto;
+            box-shadow: 4px 0 20px rgba(0, 0, 0, 0.3);
+            transition: all 0.3s ease;
+        }
 
-        // Convertir la imagen a Base64
-        const reader = new FileReader();
-        reader.onload = async function(e) {
-            const base64Image = e.target.result.split(',')[1]; // Extraer solo los datos Base64
+        .sidebar-header {
+            padding: 0 20px 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            margin-bottom: 20px;
+        }
+
+        .sidebar-header h1 {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: white;
+            line-height: 1.4;
+        }
+
+        .menu-item {
+            display: flex;
+            align-items: center;
+            padding: 15px 20px;
+            margin: 5px 15px;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            color: rgba(255, 255, 255, 0.9);
+        }
+
+        .menu-item:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .menu-item.active {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+        }
+
+        .menu-item i {
+            width: 24px;
+            margin-right: 12px;
+            font-size: 1.1rem;
+        }
+
+        .menu-item span {
+            font-size: 0.95rem;
+            font-weight: 500;
+        }
+
+        /* Mobile Menu */
+        .mobile-menu-btn {
+            display: none;
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            background: linear-gradient(180deg, #065f46, #047857);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            padding: 12px 15px;
+            font-size: 1.2rem;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+            z-index: 1000;
+        }
+
+        /* Main Content Styles */
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+        }
+
+        .content-area {
+            flex: 1;
+            padding: 30px;
+            overflow-y: auto;
+            position: relative;
+        }
+
+        .content-section {
+            display: none;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .content-section.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Quality Banner */
+        .quality-banner {
+            background: linear-gradient(90deg, #065f46, #047857);
+            padding: 15px;
+            text-align: center;
+            font-size: 0.9rem;
+            font-weight: 500;
+            color: white;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        /* Portada Styles */
+        .portada {
+            height: calc(100vh - 0px);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 20px;
+            background: 
+                linear-gradient(rgba(15, 23, 42, 0.85), rgba(15, 23, 42, 0.85)),
+                url('https://a0.cdnfan.com/images/M/6/4/4/2/ruta-en-barco-coche-chino-2_hd_159723.jpg');
+            background-size: cover;
+            background-position: center;
+        }
+
+
+        .portada h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 20px;
+            background: linear-gradient(45deg, #3b82f6, #10b981, #f59e0b);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            line-height: 1.3;
+            max-width: 1000px;
+        }
+
+        .portada p {
+            font-size: 1.2rem;
+            color: #cbd5e1;
+            margin-bottom: 40px;
+            max-width: 800px;
+            line-height: 1.6;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+        }
+
+        /* Fase 1 Styles */
+        .fase1-container {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 30px;
+            height: 100%;
+        }
+
+        .fase1-content {
+            background: rgba(30, 41, 59, 0.7);
+            border: 1px solid rgba(100, 116, 139, 0.3);
+            border-radius: 16px;
+            padding: 30px;
+            backdrop-filter: blur(10px);
+        }
+
+        .fase1-content h2 {
+            font-size: 2rem;
+            margin-bottom: 25px;
+            color: #f1f5f9;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .fase1-content h2 i {
+            background: linear-gradient(45deg, #3b82f6, #10b981);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .fase1-content p {
+            font-size: 1.1rem;
+            line-height: 1.7;
+            color: #cbd5e1;
+            margin-bottom: 20px;
+        }
+
+        .cards-container {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .card {
+            background: rgba(15, 23, 42, 0.7);
+            border: 1px solid rgba(100, 116, 139, 0.3);
+            border-radius: 12px;
+            padding: 25px;
+            transition: all 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            border-color: rgba(59, 130, 246, 0.5);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.3);
+        }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .card-icon {
+            font-size: 2rem;
+            background: linear-gradient(45deg, #3b82f6, #10b981);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .card-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: #f1f5f9;
+        }
+
+        .card-content {
+            color: #94a3b8;
+            line-height: 1.6;
+            margin-bottom: 20px;
+        }
+
+        .card-button {
+            background: linear-gradient(45deg, #065f46, #047857);
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 8px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .card-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        /* Video Container */
+        .video-container {
+            position: relative;
+            padding-bottom: 56.25%;
+            height: 0;
+            border-radius: 12px;
+            overflow: hidden;
+            margin: 30px 0;
+            background: #000;
+        }
+
+        .video-container iframe {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+
+        /* Quiz Styles */
+        .quiz-container {
+            background: rgba(15, 23, 42, 0.7);
+            border: 1px solid rgba(100, 116, 139, 0.3);
+            border-radius: 16px;
+            padding: 30px;
+            margin-top: 30px;
+        }
+
+        .question {
+            margin-bottom: 25px;
+        }
+
+        .question h4 {
+            margin-bottom: 15px;
+            color: #f1f5f9;
+            font-size: 1.1rem;
+        }
+
+        .options {
+            display: grid;
+            gap: 12px;
+        }
+
+        .option {
+            padding: 15px 20px;
+            background: rgba(30, 41, 59, 0.5);
+            border: 1px solid rgba(100, 116, 139, 0.3);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            color: #cbd5e1;
+        }
+
+        .option:hover {
+            background: rgba(59, 130, 246, 0.2);
+            border-color: rgba(59, 130, 246, 0.5);
+        }
+
+        /* Fase 2 Styles - Mapa Interactivo */
+        .fase2-full-container {
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .fase2-header {
+            background: rgba(30, 41, 59, 0.7);
+            border: 1px solid rgba(100, 116, 139, 0.3);
+            border-radius: 16px;
+            padding: 20px 30px;
+            margin-bottom: 20px;
+            backdrop-filter: blur(10px);
+        }
+
+        .fase2-header h2 {
+            font-size: 2rem;
+            color: #f1f5f9;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 10px;
+        }
+
+        .fase2-header h2 i {
+            background: linear-gradient(45deg, #3b82f6, #10b981);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .fase2-header p {
+            color: #cbd5e1;
+            font-size: 1.1rem;
+        }
+
+        .fase2-container {
+            display: grid;
+            grid-template-columns: 350px 1fr;
+            gap: 20px;
+            flex: 1;
+            min-height: 0;
+        }
+
+        .product-sidebar {
+            background: rgba(30, 41, 59, 0.7);
+            border: 1px solid rgba(100, 116, 139, 0.3);
+            border-radius: 16px;
+            padding: 25px;
+            backdrop-filter: blur(10px);
+            overflow-y: auto;
+        }
+
+        .product-sidebar h3 {
+            font-size: 1.5rem;
+            margin-bottom: 20px;
+            color: #f1f5f9;
+        }
+
+        .product-btn {
+            width: 100%;
+            padding: 15px;
+            margin-bottom: 10px;
+            border: none;
+            border-radius: 10px;
+            background: rgba(15, 23, 42, 0.7);
+            border: 1px solid rgba(100, 116, 139, 0.3);
+            cursor: pointer;
+            transition: all 0.3s;
+            text-align: left;
+            color: #cbd5e1;
+        }
+
+        .product-btn:hover {
+            background: rgba(59, 130, 246, 0.2);
+            border-color: rgba(59, 130, 246, 0.5);
+            transform: translateX(5px);
+        }
+
+        .product-btn.active {
+            background: linear-gradient(135deg, #3b82f6, #10b981);
+            color: white;
+            border-color: transparent;
+        }
+
+        .product-name {
+            font-weight: bold;
+            font-size: 1.1em;
+            margin-bottom: 5px;
+        }
+
+        .product-origin {
+            font-size: 0.9em;
+            opacity: 0.8;
+        }
+
+        .map-area {
+            background: rgba(30, 41, 59, 0.7);
+            border: 1px solid rgba(100, 116, 139, 0.3);
+            border-radius: 16px;
+            padding: 20px;
+            backdrop-filter: blur(10px);
+            display: flex;
+            flex-direction: column;
+        }
+
+        #map {
+            flex: 1;
+            border-radius: 12px;
+            min-height: 400px;
+        }
+
+        .route-info {
+            background: rgba(15, 23, 42, 0.7);
+            border: 1px solid rgba(100, 116, 139, 0.3);
+            border-radius: 12px;
+            padding: 20px;
+            margin-top: 15px;
+            display: none;
+        }
+
+        .route-info.active {
+            display: block;
+        }
+
+        .route-info h4 {
+            font-size: 1.2rem;
+            margin-bottom: 15px;
+            color: #f1f5f9;
+        }
+
+        .route-step {
+            display: flex;
+            align-items: flex-start;
+            gap: 15px;
+            padding: 15px;
+            margin-bottom: 15px;
+            border-radius: 10px;
+            background: rgba(30, 41, 59, 0.5);
+        }
+
+        .route-step.road {
+            background: rgba(59, 130, 246, 0.2);
+            border-left: 4px solid #3b82f6;
+        }
+
+        .route-step.sea {
+            background: rgba(239, 68, 68, 0.2);
+            border-left: 4px solid #ef4444;
+        }
+
+        .route-step.destination {
+            background: rgba(16, 185, 129, 0.2);
+            border-left: 4px solid #10b981;
+        }
+        
+        /* Estilo específico para el Canal de Panamá */
+        .route-step.panama {
+            background: rgba(245, 158, 11, 0.2);
+            border-left: 4px solid #f59e0b;
+        }
+
+        .step-content {
+            flex: 1;
+        }
+
+        .step-title {
+            font-weight: bold;
+            font-size: 1.1em;
+            margin-bottom: 5px;
+            color: #f1f5f9;
+        }
+
+        .step-location {
+            color: #cbd5e1;
+            margin-bottom: 5px;
+        }
+
+        .step-distance {
+            font-size: 0.9em;
+            color: #94a3b8;
+        }
+        
+        /* Ocultar el panel de control del routing machine (solo queremos el trazado azul) */
+        .leaflet-routing-container {
+            display: none;
+        }
+        
+        /* Asegurar que el trazado de la ruta terrestre sea visible y corto */
+        .leaflet-routing-line {
+            padding: 0;
+            margin: 0;
+        }
+
+
+        /* Fase 3 Styles */
+        .fase3-container {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 30px;
+            height: 100%;
+        }
+
+        .simulation-area {
+            background: rgba(30, 41, 59, 0.7);
+            border: 1px solid rgba(100, 116, 139, 0.3);
+            border-radius: 16px;
+            padding: 30px;
+            backdrop-filter: blur(10px);
+        }
+
+        .simulation-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+
+        .simulation-header i {
+            font-size: 2rem;
+            background: linear-gradient(45deg, #3b82f6, #10b981);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+
+
+        /* Fase 4 Styles */
+
+        /* Para que el mapa NO salga en otras fases */
+        .ia-map {
+            display: none;
+        }
+        
+        /* Mostrar SOLO en Fase 4 */
+        #fase4 .ia-map {
+            display: block;
+            margin-top: 30px;
+            padding: 20px;
+            background: rgba(255,255,255,0.03);
+            border-radius: 16px;
+        }
+
+            .content-section {
+            display: none;
+        }
+        .content-section.active {
+            display: block;
+        }
+        .fase4-container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .ia-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .ia-header h2 {
+            font-size: 2rem;
+            margin-bottom: 15px;
+            color: #f1f5f9;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+        }
+
+        .ia-header h2 i {
+            background: linear-gradient(45deg, #3b82f6, #10b981);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .ia-form {
+            background: rgba(30, 41, 59, 0.7);
+            border: 1px solid rgba(100, 116, 139, 0.3);
+            border-radius: 16px;
+            padding: 30px;
+            margin-bottom: 30px;
+            backdrop-filter: blur(10px);
+        }
+
+        .input-group {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+            align-items: center; /* Asegura alineación vertical */
+        }
+
+        .input-group input[type="file"] {
+             flex: 1; 
+            padding: 10px 0;
+            background: transparent;
+            border: none;
+            color: #f1f5f9;
+        }
+
+        .input-group button {
+            padding: 15px 30px;
+            background: linear-gradient(45deg, #3b82f6, #10b981);
+            border: none;
+            border-radius: 12px;
+            color: white;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            white-space: nowrap;
+        }
+
+        .input-group button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .results-container {
+            background: rgba(15, 23, 42, 0.7);
+            border: 1px solid rgba(100, 116, 139, 0.3);
+            border-radius: 16px;
+            padding: 25px;
+            margin-top: 25px;
+            display: none;
+        }
+
+        .result-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start; /* Alineación para contenido largo */
+            padding: 15px 0;
+            border-bottom: 1px solid rgba(100, 116, 139, 0.2);
+        }
+
+        .result-item:last-child {
+            border-bottom: none;
+        }
+
+        .result-item .info-label {
+            flex-shrink: 0; /* Evita que el label se encoja */
+            font-weight: 600;
+            color: #94a3b8;
+            width: 40%;
+            text-align: left;
+        }
+        
+        .result-item .info-value {
+            flex-grow: 1;
+            color: #f1f5f9;
+            text-align: right;
+        }
+        
+        .result-item[data-block="true"] {
+            display: block;
+        }
+        
+        .result-item[data-block="true"] .info-value {
+             text-align: left;
+             margin-top: 5px;
+             display: block;
+        }
+
+
+        .download-btn {
+            display: inline-block;
+            padding: 12px 25px;
+            background: linear-gradient(45deg, #f59e0b, #ef4444);
+            border: none;
+            border-radius: 8px;
+            color: white;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 20px;
+        }
+
+        .download-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        }
+
+        .ia-map {
+            height: 300px;
+            background: linear-gradient(45deg, #1e293b, #0f172a);
+            border-radius: 16px;
+            margin: 30px 0;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 1024px) {
+            .fase1-container,
+            .fase2-container,
+            .fase3-container {
+                grid-template-columns: 1fr;
+            }
+
+            .cards-container {
+                flex-direction: row;
+                flex-wrap: wrap;
+            }
+
+            .card {
+                flex: 1;
+                min-width: 250px;
+            }
+
+            .kpi-container {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                position: fixed;
+                left: -280px;
+                height: 100vh;
+                z-index: 1000;
+            }
+
+            .sidebar.active {
+                left: 0;
+            }
+
+            .mobile-menu-btn {
+                display: block;
+            }
+
+            .portada h1 {
+                font-size: 1.8rem;
+            }
+
+            .portada p {
+                font-size: 1rem;
+            }
+
+            .input-group {
+                flex-direction: column;
+            }
+
+            .input-group button {
+                width: 100%;
+            }
             
-            // Enviar la imagen a OpenAI
-            const response = await fetch('https://api.openai.com/v1/chat/completions', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${OPENAI_API_KEY}`
-                },
-                body: JSON.stringify({
-                    model: "gpt-4o", // Modelo que soporta visión
-                    messages: [
-                        {
-                            "role": "user",
-                            "content": [
-                                {
-                                    "type": "text",
-                                    "text": "Analiza esta imagen de una ruta logística. Identifica: \n1. El producto que se está transportando.\n2. El origen (ciudad y puerto).\n3. El destino (ciudad y puerto).\n4. El tipo de transporte (marítimo, terrestre, aéreo).\n5. La distancia total aproximada.\n6. La vía principal (por ejemplo, Canal de Panamá, Ruta Pacífica).\n7. Una descripción del proceso logístico desde la producción hasta la entrega.\n\nDevuelve la respuesta en formato JSON con las claves: producto, origen, destino, transporte, distancia, via, descripcion."
-                                },
-                                {
-                                    "type": "image_url",
-                                    "image_url": {
-                                        "url": `data:image/jpeg;base64,${base64Image}`
-                                    }
-                                }
-                            ]
-                        }
-                    ],
-                    max_tokens: 500
-                })
+            .result-item {
+                display: block;
+            }
+            
+            .result-item .info-label {
+                 width: 100%;
+                 margin-bottom: 5px;
+                 display: block;
+                 text-align: left !important;
+            }
+             .result-item .info-value {
+                text-align: left !important;
+            }
+            
+            .cards-container {
+                flex-direction: column;
+            }
+
+            .card {
+                min-width: 100%;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .content-area {
+                padding: 15px;
+            }
+
+            .simulation-visual {
+                height: 300px;
+            }
+
+            .flow-stages {
+                flex-direction: column;
+                gap: 30px;
+            }
+
+            .flow-arrows {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <button class="mobile-menu-btn" onclick="toggleSidebar()">
+        <i class="fas fa-bars"></i>
+    </button>
+
+    <div class="app-container">
+        <div class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <h1>Visualización Logística Portuaria</h1>
+            </div>
+            <div class="menu-item active" data-section="portada">
+                <i class="fas fa-home"></i>
+                <span>Portada</span>
+            </div>
+            <div class="menu-item" data-section="fase1">
+                <i class="fas fa-clipboard-check"></i>
+                <span>Fase 1 - Conceptos y Normas</span>
+            </div>
+            <div class="menu-item" data-section="fase2">
+                <i class="fas fa-map-marked-alt"></i>
+                <span>Fase 2 - Mapa Interactivo</span>
+            </div>
+            <div class="menu-item" data-section="fase3">
+                <i class="fas fa-project-diagram"></i>
+                <span>Fase 3 - Simulación de Flujo</span>
+            </div>
+            <div class="menu-item" data-section="fase4">
+                <i class="fas fa-robot"></i>
+                <span>Fase 4 - IA Predictiva</span>
+            </div>
+        </div>
+
+        <div class="main-content">
+            <div class="content-area">
+                <div class="content-section active" id="portada">
+                    <div class="portada">
+                        <h1>Visualización de Rutas Logísticas y Operaciones Portuarias con Enfoque en Calidad</h1>
+                        <p>Herramienta digital interactiva para el estudio y análisis de la cadena logística marítima ecuatoriana, incorporando trazabilidad, normativa y simulación.</p>
+                        <button class="card-button" onclick="showSection('fase2')">
+                            <i class="fas fa-map-marked-alt"></i> Ver Rutas Interactivas
+                        </button>
+                    </div>
+                </div>
+
+                <div class="content-section" id="fase1">
+                    <div class="fase1-container">
+                        <div class="fase1-content">
+                            <h2><i class="fas fa-clipboard-check"></i> Conceptos Clave y Normativa</h2>
+                            <p>El estudio de la logística portuaria y las rutas de exportación requiere una comprensión sólida de los conceptos de **calidad** y **normativa internacional**. La gestión efectiva de la cadena de suministro asegura la trazabilidad y la integridad del producto desde su origen hasta el destino final.</p>
+                            <p>Los Sistemas de Información Geográfica (**SIG**) son herramientas fundamentales que permiten visualizar, analizar y optimizar las rutas de transporte, ayudando a tomar decisiones informadas sobre la selección de puertos y corredores logísticos.</p>
+
+                            <div class="video-container">
+                                <iframe src="https://www.youtube.com/embed/Cow8OJ3ZzDU" frameborder="0" allowfullscreen></iframe>
+                            </div>
+                            <p style="text-align: center; margin-top: 10px; color: #94a3b8;">Calidad en operaciones portuarias: del estándar a la práctica</p>
+
+                            <div class="quiz-container">
+                                <h3>Cuestionario Interactivo</h3>
+                                <div class="question">
+                                    <h4>1. ¿Cuál de las siguientes NO es una función principal de los Sistemas de Información Geográfica (SIG) en logística?</h4>
+                                    <div class="options">
+                                        <div class="option" data-value="A">A) Visualizar rutas en mapas digitales</div>
+                                        <div class="option" data-value="B">B) Generar rutas en tiempo real con ajuste automático ante congestión vial</div>
+                                        <div class="option" data-value="C">C) Analizar datos espaciales como distancias, pendientes y restricciones de peso</div>
+                                        <div class="option" data-value="D">D) Integrar bases de datos logísticas con información geográfica</div>
+                                    </div>
+                                </div>
+                                <div class="question">
+                                    <h4>2. ¿Qué componente de un puerto se encarga específicamente de proteger el interior de las olas y corrientes marinas?</h4>
+                                    <div class="options">
+                                        <div class="option" data-value="A">A) Dársena de maniobra</div>
+                                        <div class="option" data-value="B">B) Canal de acceso</div>
+                                        <div class="option" data-value="C">C) Diques de abrigo (rompeolas)</div>
+                                        <div class="option" data-value="D">D) Plataforma portuaria</div>
+                                    </div>
+                                </div>
+                                <div class="question">
+                                    <h4>3. ¿Qué tipo de software logístico utiliza algoritmos del Problema del Viajante (TSP) y del Problema de Ruteo de Vehículos (VRP) para optimizar entregas?</h4>
+                                    <div class="options">
+                                        <div class="option" data-value="A">A) Sistemas de Gestión de Transporte (TMS)</div>
+                                        <div class="option" data-value="B">B) Plataformas de navegación como Waze</div>
+                                        <div class="option" data-value="C">C) Software de Optimización de Rutas Logísticas</div>
+                                        <div class="option" data-value="D">D) Aplicaciones de telemetría vehicular</div>
+                                    </div>
+                                </div>
+                                <div class="question">
+                                    <h4>4. ¿En qué zona portuaria se almacenan temporalmente los contenedores antes de su transporte terrestre o marítimo?</h4>
+                                    <div class="options">
+                                        <div class="option" data-value="A">A) Almacenes aduaneros</div>
+                                        <div class="option" data-value="B">B) Plataforma portuaria</div>
+                                        <div class="option" data-value="C">C) Patios de contenedores</div>
+                                        <div class="option" data-value="D">D) Terminales Ro-Ro</div>
+                                    </div>
+                                </div>
+                                <div class="question">
+                                    <h4>5. ¿Cuál de las siguientes herramientas permite simular escenarios logísticos como demanda, tráfico y tiempos de carga antes de implementarlos en la realidad?</h4>
+                                    <div class="options">
+                                        <div class="option" data-value="A">A) Google Maps API</div>
+                                        <div class="option" data-value="B">B) FlexSim</div>
+                                        <div class="option" data-value="C">C) Onfleet</div>
+                                        <div class="option" data-value="D">D) Tableau</div>
+                                    </div>
+                                </div>
+                                <div style="text-align: center; margin-top: 30px;">
+                                    <button class="card-button" onclick="calificarQuiz()" style="background: linear-gradient(45deg, #10b981, #065f46);">
+                                        <i class="fas fa-calculator"></i> Calificar
+                                    </button>
+                                    <button id="reinicio" class="card-button" onclick="reiniciarQuiz()" style="background: linear-gradient(45deg, #f59e0b, #ef4444); margin-left: 15px; display: none;">
+                                        <i class="fas fa-redo"></i> Reiniciar
+                                    </button>
+                                </div>
+                                <div id="resultado-final" style="text-align: center; margin-top: 20px; font-size: 1.5rem; font-weight: 700; display: none;"></div>
+                            </div>
+                        </div>
+                        <div class="cards-container">
+                            <div class="card">
+                                <div class="card-header">
+                                    <div class="card-icon"> <i class="fas fa-balance-scale"></i> </div>
+                                    <div class="card-title">Normas de Calidad</div>
+                                </div>
+                                <div class="card-content">
+                                    <p>Estándares ISO (9001, 28000) aplicados a la seguridad, trazabilidad y gestión de riesgos en la cadena de suministro.</p>
+                                </div>
+                                <button class="card-button" onclick="abrirPDF('Normas.pdf')">
+                                    <i class="fas fa-file-pdf"></i> Ver PDF - Normativa
+                                </button>
+                            </div>
+                            <div class="card">
+                                <div class="card-header">
+                                    <div class="card-icon"> <i class="fas fa-ship"></i> </div>
+                                    <div class="card-title">Puerto</div>
+                                </div>
+                                <div class="card-content">
+                                    <p>Vista previa de imágenes reales del Puerto de Guayaquil con grúas, contenedores y buques comerciales.</p>
+                                </div>
+                                <button class="card-button" onclick="abrirPDF('Puerto.pdf')">
+                                    <i class="fas fa-file-pdf"></i> Ver PDF / Imágenes
+                                </button>
+                            </div>
+                            <div class="card">
+                                <div class="card-header">
+                                    <div class="card-icon"> <i class="fas fa-tools"></i> </div>
+                                    <div class="card-title">Herramientas Digitales</div>
+                                </div>
+                                <div class="card-content">
+                                    <p>FlexSim (simulación), ArcGIS (mapas), herramientas de modelado y monitoreo en tiempo real.</p>
+                                </div>
+                                <button class="card-button" onclick="abrirPDF('Herramientas.pdf')">
+                                    <i class="fas fa-file-pdf"></i> Ver PDF — Herramientas
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="content-section" id="fase2">
+                    <div class="fase2-full-container">
+                        <div class="fase2-header">
+                            <h2><i class="fas fa-map-marked-alt"></i> Rastreador de Rutas de Productos Ecuatorianos</h2>
+                            <p>Rutas marítimas **corregidas** para evitar cruces terrestres. El mapa muestra: **Línea azul** (Tierra) $\rightarrow$ **Línea segmentada roja** (Mar).</p>
+                        </div>
+                        <div class="fase2-container">
+                            <div class="product-sidebar">
+                                <h3>Productos de Exportación</h3>
+                                <div id="productList"></div>
+                            </div>
+                            <div class="map-area">
+                                <div id="map"></div>
+                                <div id="routeInfo" class="route-info">
+                                    <h4><i class="fas fa-route"></i> Detalles de la Ruta</h4>
+                                    <div id="routeSteps"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="content-section" id="fase3">
+                    <div class="fase3-container">
+                        <div class="simulation-area">
+                            <div class="simulation-header">
+                                <i class="fas fa-project-diagram"></i>
+                                <h2>Simulación del Flujo de Contenedores</h2>
+                            </div>
+                            <div class="video-container" style="margin-top: 20px;">
+                                <video controls style="width:100%; border-radius:12px;">
+                                    <source src="video1.mp4" type="video/mp4">
+                                    Tu navegador no soporta reproducción de video.
+                                </video>
+                            </div>
+                        </div>
+                        <div></div>
+                    </div>
+                </div>
+
+                <div class="content-section" id="fase4">
+                    <div class="fase4-container">
+                        <div class="ia-header">
+                            <h2><i class="fas fa-robot"></i> Análisis Inteligente de Ruta</h2>
+                            <p style="color:#cbd5e1;">Cargue la captura de la ruta para que la IA deduzca el producto y analice el proceso logístico.</p>
+                        </div>
+                        
+                        <div class="ia-form">
+                            <div class="input-group">
+                                <input type="file" id="imagen-ruta" accept="image/*" style="flex: 1;">
+                                <button onclick="analizarRutaIA()">Analizar con IA <i class="fas fa-magic"></i></button>
+                            </div>
+                            <p id="loading-ia" style="text-align: center; color: #3b82f6; margin-top: 15px; display: none; font-weight: 600;">Analizando imagen de ruta con IA...</p>
+                        </div>
+
+                        <div id="results-container" class="results-container">
+                            <h3 style="margin-bottom: 20px; color: #f1f5f9;"><i class="fas fa-chart-line"></i> Resultados del Análisis Logístico</h3>
+
+                            <p style="color: #10b981; font-weight: 600; font-size: 1.1em; margin-bottom: 15px;" id="ia-deduccion"></p>
+
+                            <div class="result-item" data-block="true"><span class="info-label">Descripción General:</span> <span class="info-value" id="resultado-general">-</span></div>
+                            <div class="result-item"><span class="info-label">Punto de Origen (Puerto):</span> <span class="info-value" id="resultado-origen">-</span></div>
+                            <div class="result-item"><span class="info-label">Punto de Destino (Puerto/Ruta):</span> <span class="info-value" id="resultado-destino">-</span></div>
+                            <div class="result-item"><span class="info-label">Tiempo Estimado de Viaje (Marítimo):</span> <span class="info-value" id="resultado-tiempo">-</span></div>
+                            <div class="result-item"><span class="info-label">Tipo de Carga:</span> <span class="info-value" id="resultado-carga">-</span></div>
+                            
+                            <div class="result-item" data-block="true">
+                                <span class="info-label">Logística (Desde Zona de Producción):</span>
+                                <span class="info-value" id="resultado-logistica" style="line-height: 1.6;">-</span>
+                            </div>
+                            
+                            <div class="result-item" data-block="true" style="border-bottom: 1px solid rgba(100, 116, 139, 0.2);">
+                                <span class="info-label">Riesgos y Recomendaciones:</span>
+                                <ul id="resultado-riesgos" style="list-style-type: disc; padding-left: 20px; color: #cbd5e1; font-size: 0.95rem; line-height: 1.6;">
+                                    </ul>
+                            </div>
+
+                            <div class="result-item" data-block="true" style="border-bottom: none;"><span class="info-label">Resumen para Informe Ejecutivo:</span> <span class="info-value" id="resultado-resumen" style="line-height: 1.6;">-</span></div>
+
+                            <button class="download-btn">Descargar Informe PDF</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="quality-banner">
+                    Comprometidos con la calidad (ISO 9001), la trazabilidad y la sostenibilidad en la logística portuaria.
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Products data for Phase 2 (Keep data structure as is)
+        var products = [
+            { 
+                id: 1, 
+                name: 'Café Arábigo', 
+                origin: 'Loja, Ecuador', 
+                originPort: 'Puerto de Guayaquil, Ecuador', 
+                destPort: 'Puerto de Long Beach, California, USA', 
+                coords: { 
+                    origin: [-4.0, -79.2], 
+                    originPort: [-2.27, -79.9], 
+                    destPort: [33.75, -118.19] 
+                }, 
+                // RUTA CORREGIDA: Vía Pacífico (NO Canal de Panamá)
+                seaRoute: [ 
+                    [-2.27, -79.9], [-4, -85], [-6, -90], [-7, -95], [-7, -100], [-6, -105], 
+                    [-4, -110], [-1, -113], [3, -116], [8, -117], [13, -117.5], [18, -118], 
+                    [23, -118.1], [28, -118.15], 
+                    [33.75, -118.19] 
+                ],
+                usesPanama: false,
+                isReefer: false,
+                destinoKey: "USA (Ruta Transpacífica)",
+                days: 20
+            },
+            { 
+                id: 2, 
+                name: 'Banano', 
+                origin: 'El Oro, Ecuador', 
+                originPort: 'Puerto de Guayaquil, Ecuador', 
+                destPort: 'Puerto de Rotterdam, Países Bajos', 
+                coords: { 
+                    origin: [-3.0, -79.8], 
+                    originPort: [-2.27, -79.9], 
+                    destPort: [51.9, 4.47] 
+                }, 
+                // RUTA CORREGIDA: Vía Canal de Panamá 🚢
+                seaRoute: [
+                    [-2.27, -79.9], // Puerto de Guayaquil
+                    [2, -80], 
+                    [7.0, -80.5], // Aproximación al Canal
+                    [8.9, -79.5], // Entrada al Canal (Pacifico)
+                    [9.5, -79.2], // Salida del Canal (Atlántico/Caribe)
+                    [15.0, -70.0], // Mar Caribe
+                    [20.0, -60.0],
+                    [30.0, -40.0],
+                    [40.0, -20.0],
+                    [50.0, -5.0],
+                    [51.9, 4.47] // Puerto de Rotterdam
+                ],
+                usesPanama: true,
+                isReefer: true,
+                destinoKey: "Europa (Ruta Canal de Panamá)",
+                days: 18
+            },
+            { 
+                id: 3, 
+                name: 'Cacao', 
+                origin: 'Guayas, Ecuador', 
+                originPort: 'Puerto de Guayaquil, Ecuador', 
+                destPort: 'Puerto de Génova, Italia', 
+                coords: { 
+                    origin: [-2.19, -79.88], 
+                    originPort: [-2.27, -79.9], 
+                    destPort: [44.4, 8.94] 
+                }, 
+                // RUTA CORREGIDA: Vía Canal de Panamá y Estrecho de Gibraltar 🇪🇸
+                seaRoute: [
+                    [-2.27, -79.9], // Puerto de Guayaquil
+                    [2, -80], 
+                    [7.0, -80.5], // Aproximación al Canal
+                    [8.9, -79.5], // Entrada al Canal (Pacifico)
+                    [9.5, -79.2], // Salida del Canal (Atlántico/Caribe)
+                    [20.0, -60.0],
+                    [30.0, -40.0],
+                    [35.0, -20.0],
+                    [36.0, -5.0], // Estrecho de Gibraltar
+                    [40.0, 0.0],
+                    [44.4, 8.94] // Puerto de Génova
+                ],
+                usesPanama: true,
+                isReefer: false,
+                destinoKey: "Mediterráneo (Ruta Canal de Panamá/Gibraltar)",
+                days: 22
+            },
+            { 
+                id: 4, 
+                name: 'Camarón', 
+                origin: 'Guayas, Ecuador', 
+                originPort: 'Puerto de Guayaquil, Ecuador', 
+                destPort: 'Puerto de Valencia, España', 
+                coords: { 
+                    origin: [-2.27, -79.9], 
+                    originPort: [-2.27, -79.9], 
+                    destPort: [39.47, -0.37] 
+                }, 
+                // RUTA CORREGIDA: Vía Canal de Panamá y Estrecho de Gibraltar 🇪🇸
+                seaRoute: [
+                    [-2.27, -79.9], // Puerto de Guayaquil
+                    [2, -80], 
+                    [7.0, -80.5], // Aproximación al Canal
+                    [8.9, -79.5], // Entrada al Canal (Pacifico)
+                    [9.5, -79.2], // Salida del Canal (Atlántico/Caribe)
+                    [20.0, -60.0],
+                    [30.0, -40.0],
+                    [35.0, -20.0],
+                    [36.0, -5.0], // Estrecho de Gibraltar
+                    [39.47, -0.37] // Puerto de Valencia
+                ],
+                usesPanama: true,
+                isReefer: true,
+                destinoKey: "Mediterráneo (Ruta Canal de Panamá/Gibraltar)",
+                days: 20
+            },
+            { 
+                id: 5, 
+                name: 'Flor (Rosa)', 
+                origin: 'Pichincha, Ecuador', 
+                originPort: 'Puerto de Guayaquil, Ecuador', 
+                destPort: 'Puerto de Shanghai, China', 
+                coords: { 
+                    origin: [-2.19, -79.88], 
+                    originPort: [-2.27, -79.9], 
+                    destPort: [31.23, 121.47] 
+                }, 
+                // RUTA CORREGIDA: Vía Pacífico (NO Canal de Panamá)
+                seaRoute: [ 
+                    [-2.27, -79.9], [-4, -86], [-7, -94], [-10, -102], [-14, -110], [-18, -118], 
+                    [-22, -126], [-26, -134], [-29, -142], [-31, -150], [-32, -158], [-31, -166], 
+                    [-29, -173], [-26, 179], [-22, 175], [-18, 168], [-14, 161], [-10, 155], 
+                    [-6, 150], [-2, 146], [2, 142], [6, 139], [10, 136], [14, 133], [18, 130], 
+                    [22, 127], [26, 124], 
+                    [31.23, 121.47] 
+                ],
+                usesPanama: false,
+                isReefer: true,
+                destinoKey: "Asia (Ruta Transpacífica Larga)",
+                days: 35
+            },
+             { 
+                id: 6, 
+                name: 'Atún', 
+                origin: 'Manta, Ecuador', 
+                originPort: 'Puerto de Manta, Ecuador', 
+                destPort: 'Puerto de Miami, USA', 
+                coords: { 
+                    origin: [-0.95, -80.73], 
+                    originPort: [-0.96, -80.71], 
+                    destPort: [25.77, -80.19] 
+                }, 
+                // RUTA CORREGIDA: Vía Canal de Panamá
+                seaRoute: [ 
+                    [-0.96, -80.71], 
+                    [4, -80.71], 
+                    [8.9, -79.5], // Entrada al Canal (Pacifico)
+                    [9.5, -79.2], // Salida del Canal (Atlántico/Caribe)
+                    [15, -75], 
+                    [20, -78], 
+                    [25.77, -80.19] // Puerto de Miami
+                ],
+                usesPanama: true,
+                isReefer: false,
+                destinoKey: "USA Costa Este (Ruta Canal de Panamá)",
+                days: 8
+            },
+            { 
+                id: 7, 
+                name: 'Pita', 
+                origin: 'Manabí, Ecuador', 
+                originPort: 'Puerto de Manta, Ecuador', 
+                destPort: 'Puerto de Los Ángeles, USA', 
+                coords: { 
+                    origin: [-0.6, -80.5], 
+                    originPort: [-0.96, -80.71], 
+                    destPort: [33.73, -118.25] 
+                }, 
+                // RUTA CORREGIDA: Vía Pacífico (NO Canal de Panamá)
+                seaRoute: [ 
+                    [-0.96, -80.71], [0, -83], [2, -85], [4, -87], [6, -88], [8, -90], [13, -100], 
+                    [18, -110], [23, -115], [28, -118], 
+                    [33.73, -118.25] 
+                ],
+                usesPanama: false,
+                isReefer: false,
+                destinoKey: "USA Costa Oeste (Ruta Pacífico Corta)",
+                days: 15
+            },
+            { 
+                id: 8, 
+                name: 'Bananito (Baby Banana)', 
+                origin: 'El Oro, Ecuador', 
+                originPort: 'Puerto Bolívar, Ecuador', 
+                destPort: 'Puerto de New York, USA', 
+                coords: { 
+                    origin: [-3.3, -79.96], 
+                    originPort: [-3.33, -80.01], 
+                    destPort: [40.7, -74.0] 
+                }, 
+                // RUTA CORREGIDA: Vía Canal de Panamá (Long)
+                seaRoute: [ 
+                    [-3.33, -80.01], // Puerto Bolívar
+                    [2, -80], 
+                    [7.0, -80.5], // Aproximación al Canal
+                    [8.9, -79.5], // Entrada al Canal (Pacifico)
+                    [9.5, -79.2], // Salida del Canal (Atlántico/Caribe)
+                    [15.0, -70.0], // Mar Caribe
+                    [25.0, -65.0],
+                    [35.0, -70.0],
+                    [40.7, -74.0] // Puerto de New York
+                ],
+                usesPanama: true,
+                isReefer: true,
+                destinoKey: "USA Costa Este (Ruta Canal de Panamá)",
+                days: 12
+            },
+            { 
+                id: 9, 
+                name: 'Piña', 
+                origin: 'Los Ríos, Ecuador', 
+                originPort: 'Puerto de Guayaquil, Ecuador', 
+                destPort: 'Puerto de Marsella, Francia', 
+                coords: { 
+                    origin: [-1.4, -79.4], 
+                    originPort: [-2.27, -79.9], 
+                    destPort: [43.3, 5.3] 
+                }, 
+                // RUTA CORREGIDA: Vía Canal de Panamá y Estrecho de Gibraltar 🇫🇷
+                seaRoute: [
+                    [-2.27, -79.9], // Puerto de Guayaquil
+                    [2, -80], 
+                    [7.0, -80.5], // Aproximación al Canal
+                    [8.9, -79.5], // Entrada al Canal (Pacifico)
+                    [9.5, -79.2], // Salida del Canal (Atlántico/Caribe)
+                    [20.0, -60.0],
+                    [30.0, -40.0],
+                    [35.0, -20.0],
+                    [36.0, -5.0], // Estrecho de Gibraltar
+                    [40.0, 2.0],
+                    [43.3, 5.3] // Puerto de Marsella
+                ],
+                usesPanama: true,
+                isReefer: true,
+                destinoKey: "Mediterráneo (Ruta Canal de Panamá/Gibraltar)",
+                days: 21
+            },
+            { 
+                id: 10, 
+                name: 'Pescado Seco', 
+                origin: 'Guayaquil, Ecuador', 
+                originPort: 'Puerto de Guayaquil, Ecuador', 
+                destPort: 'Puerto de Jebel Ali, Dubai, EAU', 
+                coords: { 
+                    origin: [-2.19, -79.88], 
+                    originPort: [-2.27, -79.9], 
+                    destPort: [25.27, 55.30] 
+                }, 
+                // RUTA CORREGIDA: Vía Pacífico y Sur de Asia 
+                seaRoute: [ 
+                    [-2.27, -79.9], [-4, -86], [-7, -94], [-10, -102], [-14, -110], [-18, -118], 
+                    [-22, -126], [-26, -134], [-29, -142], [-31, -150], [-32, -158], [-31, -166], 
+                    [-29, -173], [-26, 179], [-22, 175], [-18, 168], [-14, 161], [-10, 154], 
+                    [-6, 147], [-2, 140], [1, 132], [3, 123], [5, 114], [6, 105], [7, 96], [8, 87], 
+                    [9, 78], [11, 70], [14, 63], [18, 58], [22, 56], 
+                    [25.27, 55.30] 
+                ],
+                usesPanama: false,
+                isReefer: false,
+                destinoKey: "Medio Oriente (Ruta Transpacífica/Índico)",
+                days: 40
+            },
+            { 
+                id: 11, 
+                name: 'Palmito', 
+                origin: 'Esmeraldas, Ecuador', 
+                originPort: 'Puerto de Esmeraldas, Ecuador', 
+                destPort: 'Puerto de Barcelona, España', 
+                coords: { 
+                    origin: [0.97, -79.65], 
+                    originPort: [0.96, -79.65], 
+                    destPort: [41.35, 2.17] 
+                }, 
+                // RUTA CORREGIDA: Vía Canal de Panamá
+                seaRoute: [ 
+                    [0.96, -79.65], 
+                    [4, -80], 
+                    [8.9, -79.5], 
+                    [9.5, -79.2], 
+                    [15.0, -70.0], 
+                    [30.0, -40.0],
+                    [35.0, -20.0],
+                    [36.0, -5.0], 
+                    [41.35, 2.17] 
+                ],
+                usesPanama: true,
+                isReefer: false,
+                destinoKey: "Mediterráneo (Ruta Canal de Panamá/Gibraltar)",
+                days: 20
+            },
+            { 
+                id: 12, 
+                name: 'Pescado Enlatado', 
+                origin: 'Manta, Ecuador', 
+                originPort: 'Puerto de Manta, Ecuador', 
+                destPort: 'Puerto de Veracruz, México', 
+                coords: { 
+                    origin: [-0.95, -80.73], 
+                    originPort: [-0.96, -80.71], 
+                    destPort: [19.19, -96.13] 
+                }, 
+                // RUTA CORREGIDA: Vía Pacífico/Costa (NO Canal de Panamá)
+                seaRoute: [ 
+                    [-0.96, -80.71], [0, -83], [2, -85], [4, -87], [6, -88], [8, -90], [10, -92], 
+                    [12, -94], [15, -95], 
+                    [19.19, -96.13] 
+                ],
+                usesPanama: false,
+                isReefer: false,
+                destinoKey: "México (Ruta Pacífico)",
+                days: 8
+            }
+        ];
+
+        // Global variables for map and routing
+        var map;
+        var routingControl = null;
+        var markers = [];
+        var polylines = [];
+        var selectedProduct = null;
+        
+        // Leaflet setup
+        function initMap() {
+            if (map) map.remove(); 
+            map = L.map('map').setView([-2.0, -79.0], 5);
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+            }).addTo(map);
+
+            renderProductList();
+            // Mostrar la primera ruta por defecto
+            if (products.length > 0) {
+                selectProduct(products[1].id); // Por defecto, Banano, que usa Panamá
+            }
+        }
+
+        // Helper function to calculate sea distance (great-circle distance approximation)
+        function calculateSeaDistance(coords) {
+            var totalDistance = 0;
+            for (var i = 0; i < coords.length - 1; i++) {
+                var p1 = L.latLng(coords[i]);
+                var p2 = L.latLng(coords[i + 1]);
+                totalDistance += p1.distanceTo(p2) / 1000;
+            }
+            return totalDistance;
+        }
+
+        // Clear existing elements on the map
+        function clearMap() {
+            for (var i = 0; i < markers.length; i++) { map.removeLayer(markers[i]); }
+            for (var i = 0; i < polylines.length; i++) { map.removeLayer(polylines[i]); }
+            // IMPORTANTE: Solo remover el control de routing si existe
+            if (routingControl) { 
+                map.removeControl(routingControl); 
+                routingControl = null; 
+            }
+            markers = [];
+            polylines = [];
+            document.getElementById('routeInfo').classList.remove('active');
+        }
+
+        // Show route for a selected product
+        function showRoute(product) {
+            clearMap();
+
+            // Icons for markers
+            var greenIcon = L.icon({ 
+                iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-green.png', 
+                shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png', 
+                iconSize: [25, 41], iconAnchor: [12, 41], popupAnchor: [1, -34], shadowSize: [41, 41] 
+            });
+            var blueIcon = L.icon({ 
+                iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-blue.png', 
+                shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png', 
+                iconSize: [25, 41], iconAnchor: [12, 41], popupAnchor: [1, -34], shadowSize: [41, 41] 
+            });
+            var redIcon = L.icon({ 
+                iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-red.png', 
+                shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png', 
+                iconSize: [25, 41], iconAnchor: [12, 41], popupAnchor: [1, -34], shadowSize: [41, 41] 
             });
 
-            // Quitar el mensaje de carga
-            loadingDiv.remove();
+            // 1. Origin Production Marker (Green)
+            var originMarker = L.marker(product.coords.origin, {icon: greenIcon});
+            originMarker.bindPopup('<b>Zona de Producción</b><br>' + product.origin).addTo(map);
+            markers.push(originMarker);
 
-            if (!response.ok) {
-                throw new Error(`Error de OpenAI: ${response.status} ${response.statusText}`);
-            }
+            // 2. Origin Port Marker (Blue)
+            var originPortMarker = L.marker(product.coords.originPort, {icon: blueIcon});
+            originPortMarker.bindPopup('<b>Puerto de Origen</b><br>' + product.originPort).addTo(map);
+            markers.push(originPortMarker);
 
-            const data = await response.json();
+            // 3. Destination Port Marker (Red)
+            var destMarker = L.marker(product.coords.destPort, {icon: redIcon});
+            destMarker.bindPopup('<b>Puerto de Destino</b><br>' + product.destPort).addTo(map);
+            markers.push(destMarker);
+
+            // 4. Land Route (Routing Machine - uses a simple route)
+            var landRouteWaypoints = [ 
+                L.latLng(product.coords.origin[0], product.coords.origin[1]), 
+                L.latLng(product.coords.originPort[0], product.coords.originPort[1]) 
+            ];
             
-            // Procesar la respuesta
-            let analysis;
+            var landDist = 0; // Se inicializa para el info panel
+            var seaDist = calculateSeaDistance(product.seaRoute);
+
             try {
-                // Intentar parsear la respuesta como JSON
-                analysis = JSON.parse(data.choices[0].message.content);
-            } catch (e) {
-                // Si falla, usar la respuesta completa como descripción
-                analysis = {
-                    producto: "No identificado",
-                    origen: "No identificado",
-                    destino: "No identificado",
-                    transporte: "No identificado",
-                    distancia: "No identificada",
-                    via: "No identificada",
-                    descripcion: data.choices[0].message.content
-                };
+                // Configuración para solo mostrar el trazado terrestre (azul)
+                routingControl = L.Routing.control({
+                    waypoints: landRouteWaypoints,
+                    routeWhileDragging: false,
+                    addWaypoints: false,
+                    draggableWaypoints: false,
+                    fitSelectedRoutes: false, 
+                    showAlternatives: false,
+                    lineOptions: { styles: [{color: '#3b82f6', opacity: 0.9, weight: 6}] },
+                    createMarker: function() { return null; }
+                }).addTo(map);
+                
+                // Esperar a que se calcule la ruta terrestre para obtener la distancia
+                routingControl.on('routesfound', function(e) {
+                    var route = e.routes[0];
+                    landDist = route.summary.totalDistance / 1000; 
+                    updateRouteInfo(product, landDist, seaDist);
+                    map.fitBounds(seaLine.getBounds(), { padding: [50, 50] });
+                });
+
+            } catch(e) {
+                console.log('Error en routing:', e);
+                 // Fallback distance for land route if routing machine fails
+                landDist = L.latLng(product.coords.origin).distanceTo(L.latLng(product.coords.originPort)) / 1000;
+                updateRouteInfo(product, landDist, seaDist);
+                map.fitBounds(seaLine.getBounds(), { padding: [50, 50] });
+            }
+            
+            // 5. Sea Route (Custom Polyline - The corrected path)
+            var seaLine = L.polyline(product.seaRoute, { 
+                color: '#ef4444', 
+                weight: 5, 
+                opacity: 0.9,
+                dashArray: '10, 10' // Línea segmentada para diferenciar
+            }).addTo(map);
+            polylines.push(seaLine);
+
+            // Si el routing machine falla, centramos en la ruta marítima de inmediato
+            if (!routingControl) {
+                map.fitBounds(seaLine.getBounds(), { padding: [50, 50] });
+            }
+        }
+
+        // Update the route info panel
+        function updateRouteInfo(product, landDist, seaDist) {
+            var totalDist = landDist + seaDist;
+
+            // Determina si usa Canal de Panamá
+            var usesPanama = product.usesPanama;
+            
+            var canalStep = usesPanama ? 
+                '<div class="route-step panama">' + 
+                    '<div class="step-content">' + 
+                        '<div class="step-title"><i class="fas fa-lock"></i> Paso Crucial</div>' + 
+                        '<div class="step-location">Ruta Marítima vía **Canal de Panamá**</div>' + 
+                        '<div class="step-distance">Gestión de tiempos, peajes y restricciones de calado.</div>' + 
+                    '</div>' + 
+                '</div>' : '';
+            
+            var maritimeTitle = usesPanama ? 'Ruta Marítima (Atlántica Post-Panamax)' : 'Ruta Marítima (Transoceánica)';
+
+            var html = 
+                '<div class="route-step road">' + 
+                    '<div class="step-content">' + 
+                        '<div class="step-title">Origen: Zona de Producción</div>' + 
+                        '<div class="step-location">' + product.origin + '</div>' + 
+                        '<div class="step-distance">Distancia terrestre: ~' + landDist.toLocaleString(undefined, { maximumFractionDigits: 0 }) + ' km</div>' + 
+                    '</div>' + 
+                '</div>' +
+                '<div class="route-step road">' + 
+                    '<div class="step-content">' + 
+                        '<div class="step-title">Puerto de Salida</div>' + 
+                        '<div class="step-location">' + product.originPort + '</div>' + 
+                        '<div class="step-distance">Transferencia de carga a buque</div>' + 
+                    '</div>' + 
+                '</div>' +
+                canalStep + // Insert the Panama Canal step here
+                '<div class="route-step sea">' + 
+                    '<div class="step-content">' + 
+                        '<div class="step-title">' + maritimeTitle + '</div>' + 
+                        '<div class="step-location">Hasta: ' + product.destPort + '</div>' + 
+                        '<div class="step-distance">Distancia marítima: ~' + seaDist.toLocaleString(undefined, { maximumFractionDigits: 0 }) + ' km (Tiempo est. ' + product.days + ' días)</div>' + 
+                    '</div>' + 
+                '</div>' +
+                '<div class="route-step destination">' +
+                    '<div class="step-content">' + 
+                        '<div class="step-title">Puerto Final</div>' + 
+                        '<div class="step-location">' + product.destPort + '</div>' + 
+                        '<div class="step-distance">Destino final del producto</div>' + 
+                    '</div>' + 
+                '</div>' +
+                '<div class="route-step" style="background: linear-gradient(135deg, #3b82f6 0%, #10b981 100%); color: white; border-left: none;">' + 
+                    '<div class="step-content">' + 
+                        '<div class="step-title">Distancia Total Estimada</div>' + 
+                        '<div class="step-location" style="color: white;">' + totalDist.toLocaleString(undefined, { maximumFractionDigits: 0 }) + ' km aproximadamente</div>' + 
+                    '</div>' + 
+                '</div>';
+
+            document.getElementById('routeSteps').innerHTML = html;
+            document.getElementById('routeInfo').classList.add('active');
+        }
+
+        // Render the list of products in the sidebar
+        function renderProductList() {
+            var listEl = document.getElementById('productList');
+            var html = '';
+            for (var i = 0; i < products.length; i++) {
+                var product = products[i];
+                html += '<button class="product-btn" onclick="selectProduct(' + product.id + ')">' + 
+                            '<div class="product-name">' + product.name + '</div>' + 
+                            '<div class="product-origin">' + product.origin + '</div>' + 
+                        '</button>';
+            }
+            listEl.innerHTML = html;
+        }
+
+        // Handle product selection
+        function selectProduct(id) {
+            for (var i = 0; i < products.length; i++) {
+                if (products[i].id === id) {
+                    selectedProduct = products[i];
+                    break;
+                }
+            }
+            var buttons = document.querySelectorAll('.product-btn');
+            for (var i = 0; i < buttons.length; i++) {
+                if (products[i].id === id) { 
+                    buttons[i].classList.add('active');
+                } else {
+                    buttons[i].classList.remove('active');
+                }
+            }
+            showRoute(selectedProduct);
+        }
+
+        // Navigation function 
+        function showSection(sectionId) {
+            document.querySelectorAll('.content-section').forEach(section => {
+                section.classList.remove('active');
+            });
+            document.getElementById(sectionId).classList.add('active');
+
+            document.querySelectorAll('.menu-item').forEach(item => {
+                item.classList.remove('active');
+            });
+            const menuItem = document.querySelector(`.menu-item[data-section="${sectionId}"]`);
+            if (menuItem) {
+                menuItem.classList.add('active');
             }
 
-            // Actualizar la interfaz con los resultados
-            document.getElementById('resultado-producto').textContent = analysis.producto || "-";
-            document.getElementById('resultado-origen').textContent = analysis.origen || "-";
-            document.getElementById('resultado-destino').textContent = analysis.destino || "-";
-            document.getElementById('resultado-transporte').textContent = analysis.transporte || "-";
-            document.getElementById('resultado-distancia').textContent = analysis.distancia || "-";
-            document.getElementById('resultado-via').textContent = analysis.via || "-";
-            document.getElementById('resultado-descripcion').textContent = analysis.descripcion || "-";
+            if (sectionId === 'fase2') {
+                setTimeout(initMap, 100); 
+            }
+            
+            if (window.innerWidth <= 768) {
+                document.getElementById('sidebar').classList.remove('active');
+            }
+        }
+        
+        // Mobile sidebar toggle
+        function toggleSidebar() {
+            document.getElementById('sidebar').classList.toggle('active');
+        }
 
-            // Mostrar los resultados
-            document.getElementById('ia-results').style.display = 'block';
-
+        // Quiz Logic (kept unchanged)
+        const respuestas = {
+            1: "B",
+            2: "C",
+            3: "C",
+            4: "C",
+            5: "B"
         };
 
-        reader.readAsDataURL(file);
+        document.querySelectorAll(".option").forEach(op => {
+            op.addEventListener("click", function() {
+                let parent = this.parentNode;
+                parent.querySelectorAll(".option").forEach(o => {
+                    o.style.background = "rgba(30, 41, 59, 0.5)";
+                    o.removeAttribute("selected");
+                });
+                this.style.background = "rgba(59, 130, 246, 0.3)";
+                this.setAttribute("selected", "true");
+            });
+        });
 
-    } catch (error) {
-        console.error('Error:', error);
-        alert(`Ocurrió un error al analizar la imagen: ${error.message}`);
-    }
-}
+        function calificarQuiz() {
+            let puntaje = 0;
+            let preguntas = document.querySelectorAll(".question");
 
-function descargarPDF() {
-    const { jsPDF } = window.jspdf;
-    const doc = new jsPDF();
-    
-    // Título
-    doc.setFontSize(20);
-    doc.text("Informe de Ruta Logística", 20, 20);
-    
-    // Datos
-    doc.setFontSize(12);
-    doc.text(`Producto: ${document.getElementById('resultado-producto').textContent}`, 20, 40);
-    doc.text(`Origen: ${document.getElementById('resultado-origen').textContent}`, 20, 55);
-    doc.text(`Destino: ${document.getElementById('resultado-destino').textContent}`, 20, 70);
-    doc.text(`Tipo de Transporte: ${document.getElementById('resultado-transporte').textContent}`, 20, 85);
-    doc.text(`Distancia Total: ${document.getElementById('resultado-distancia').textContent}`, 20, 100);
-    doc.text(`Vía Principal: ${document.getElementById('resultado-via').textContent}`, 20, 115);
-    doc.text(`Descripción:`, 20, 130);
-    
-    // Descripción (con salto de línea si es necesario)
-    const descripcion = document.getElementById('resultado-descripcion').textContent;
-    const lines = doc.splitTextToSize(descripcion, 170); // Ajusta el ancho según necesites
-    doc.text(lines, 20, 140);
-    
-    // Guardar el PDF
-    doc.save('informe_ruta_logistica.pdf');
-}
-</script>
+            preguntas.forEach((pregunta, index) => {
+                let seleccionada = pregunta.querySelector(".option[selected='true']");
+                if (seleccionada && seleccionada.getAttribute("data-value") === respuestas[index+1]) {
+                    puntaje++;
+                }
+            });
+
+            let resDiv = document.getElementById("resultado-final");
+            resDiv.style.display = "block";
+            resDiv.textContent = `Tu puntaje final es: ${puntaje}/5`;
+
+            if(puntaje===5){
+                resDiv.style.color = "#22c55e";
+            } else {
+                resDiv.style.color = "#f87171";
+            }
+
+            document.getElementById("reinicio").style.display = "inline-block";
+        }
+        
+        function reiniciarQuiz() {
+            document.querySelectorAll(".option").forEach(o => {
+                o.style.background = "rgba(30, 41, 59, 0.5)";
+                o.removeAttribute("selected");
+            });
+             document.getElementById("resultado-final").style.display = "none";
+             document.getElementById("reinicio").style.display = "none";
+        }
+
+        // FASE 4 - LÓGICA DE SIMULACIÓN DE IA (MEJORADA Y CORREGIDA)
+        async function analizarRutaIA() {
+            const fileInput = document.getElementById('imagen-ruta');
+            const resultsContainer = document.getElementById('results-container');
+            const loadingMessage = document.getElementById('loading-ia');
+            const iaDeduction = document.getElementById('ia-deduccion');
+            
+            if (!fileInput.files.length) {
+                alert('Por favor, cargue una imagen de la ruta generada en la Fase 2.');
+                return;
+            }
+
+            resultsContainer.style.display = 'none';
+            loadingMessage.textContent = `Analizando imagen de ruta con IA... (Simulando Detección Visual)`;
+            loadingMessage.style.display = 'block';
+
+            // --- INICIO DE SIMULACIÓN DE DETECCIÓN DE IA (simula leer la ruta de la imagen) ---
+            await new Promise(resolve => setTimeout(resolve, 3000)); 
+
+            // Simulación: La IA "detecta" que es la ruta del Banano porque tiene la curva característica del Canal de Panamá y va hacia Europa.
+            // Para la demostración, usaremos la información del producto actualmente seleccionado en la Fase 2 (si existe), o el Banano por defecto.
+            const productoSimulado = selectedProduct || products[1]; // Por defecto, Banano (ID 2)
+            
+            // Simulación de la deducción de la IA
+            iaDeduction.textContent = `Deducción de la IA: En la imagen se logra observar una ruta marítima con un desvío claro hacia el Este (Atlántico), indicando el paso por el Canal de Panamá. Esta ruta es característica de productos perecederos de alto volumen como el **${productoSimulado.name.toUpperCase()}**.`;
+            
+            // ----------------------------------------------------
+            // Estructuración del Reporte de IA
+            // ----------------------------------------------------
+            
+            let producto = productoSimulado;
+
+            let descripcionGeneral = `La ruta para el producto **${producto.name.toUpperCase()}** es de alta criticidad, involucrando un transporte intermodal desde ${producto.origin} y la navegación por el corredor ${producto.destinoKey}.`;
+            let origen = producto.origin + ' (Puerto de embarque: ' + producto.originPort + ')';
+            let destino = producto.destPort + ' (' + producto.destinoKey + ')';
+            let tiempoEstimado = `${producto.days} días de tránsito marítimo (aprox. 3-4 semanas puerta a puerta).`;
+            let tipoCarga = producto.isReefer ? 
+                "Carga Perecedera (Contenedores Reefer de 40' o 20') que requiere cadena de frío estricta y monitoreo constante de temperatura y humedad." : 
+                "Carga General o Seca en contenedor estándar (20' o 40' Dry Van).";
+            
+            let riesgos = [];
+            let logistica = `**Recolección Terrestre:** Uso de camiones (o camiones refrigerados si aplica) para transportar la carga desde ${producto.origin} hasta el puerto de origen (${producto.originPort}).
+                \n**Inspección y Aduana:** Inspección fitosanitaria y de carga rápida en puerto.
+                \n**Embarque Marítimo:** Carga y estiba en buque portacontenedores, priorizando conexiones reefer. La ruta incluye el cruce estratégico del ${producto.usesPanama ? 'Canal de Panamá' : 'Océano Pacífico'}.`;
+            let resumen = `Ruta estándar consolidada. Se requiere un riguroso plan de trazabilidad y contingencia, especialmente en el punto de transbordo y el ${producto.usesPanama ? 'paso por el Canal de Panamá' : 'tránsito largo transoceánico'}.`;
+
+
+            if (producto.isReefer) {
+                riesgos.push("Riesgo: Pérdida de la cadena de frío. Recomendación: **Implementar sensores IoT** para trazabilidad de temperatura en tiempo real (cada 4 horas) y establecer procedimientos de emergencia en caso de fallos del reefer.");
+            } else {
+                 riesgos.push("Riesgo: Daño por manipulación o aplastamiento. Recomendación: Supervisar el proceso de estiba para asegurar la correcta distribución del peso y utilizar material de embalaje reforzado.");
+            }
+
+            if (producto.usesPanama) {
+                riesgos.push("Riesgo: Demoras operacionales en el Canal de Panamá (debido a calado o congestión). Recomendación: **Coordinar la reserva de slot** con anticipación y considerar los niveles de agua para buques Post-Panamax.");
+            } else {
+                 riesgos.push("Riesgo: Tiempos de tránsito prolongados por ruta transoceánica. Recomendación: Planificación de stock de seguridad y optimización de días de llegada para evitar *dead stock*.");
+            }
+
+            riesgos.push("Riesgo: Variaciones en el precio del combustible (Bunker). Recomendación: Utilizar fletes con contratos de cobertura de precio (Bunker Adjustment Factor - BAF) para mitigar la volatilidad.");
+            riesgos.push("Riesgo: Riesgo de piratería en zonas específicas (si la ruta pasa por el Mar Rojo o Golfo de Adén - No aplica directamente aquí, pero es un riesgo global relevante). Recomendación: Monitoreo constante de alertas marítimas y seguro de flete adecuado.");
+
+
+            const finalAnalysis = {
+                "descripcion_general": descripcionGeneral,
+                "origen": origen,
+                "destino": destino,
+                "tiempo_estimado": tiempoEstimado,
+                "tipo_carga": tipoCarga,
+                "riesgos_recomendaciones": riesgos,
+                "logistica": logistica.replace(/\n/g, '<br>'), // Para mostrar bien los saltos de línea
+                "resumen_informe": resumen,
+            };
+            // --- FIN DE SIMULACIÓN ---
+            
+            // 3. Mostrar Resultados
+            loadingMessage.style.display = 'none';
+            displayAIResults(finalAnalysis);
+            resultsContainer.style.display = 'block';
+        }
+
+        // Function to display the results in the HTML
+        function displayAIResults(analysis) {
+            document.getElementById('resultado-general').textContent = analysis.descripcion_general;
+            document.getElementById('resultado-origen').textContent = analysis.origen;
+            document.getElementById('resultado-destino').textContent = analysis.destino;
+            document.getElementById('resultado-tiempo').textContent = analysis.tiempo_estimado;
+            document.getElementById('resultado-carga').textContent = analysis.tipo_carga;
+            document.getElementById('resultado-logistica').innerHTML = analysis.logistica;
+            document.getElementById('resultado-resumen').textContent = analysis.resumen_informe;
+            
+            // Risks and Recommendations List
+            const risksList = document.getElementById('resultado-riesgos');
+            risksList.innerHTML = '';
+            analysis.riesgos_recomendaciones.forEach(item => {
+                const li = document.createElement('li');
+                li.innerHTML = item; 
+                risksList.appendChild(li);
+            });
+        }
+        
+        // Download PDF functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            const downloadBtn = document.querySelector('.download-btn');
+            if (downloadBtn) {
+                downloadBtn.addEventListener('click', function() {
+                    alert('Generando informe PDF... En una implementación real, esto descargaría el archivo generado con los datos de la IA.');
+                });
+            }
+            
+            // ATTACH EVENT LISTENERS FOR MENU ITEMS (Fixing the main navigation issue)
+            document.querySelectorAll('.menu-item').forEach(item => {
+                item.addEventListener('click', function() {
+                    const sectionId = this.getAttribute('data-section');
+                    if (sectionId) {
+                        showSection(sectionId);
+                    }
+                });
+            });
+
+            // Initial call to show the first section
+            showSection('portada'); 
+        });
+        
+        // Utility to open PDF (Placeholder)
+        function abrirPDF(nombrePDF) {
+            const url = nombrePDF;
+            const link = document.createElement('a');
+            link.href = url;
+            link.target = "_blank";
+            link.click();
+            alert(`Simulación de descarga/visualización del archivo: ${nombrePDF}`);
+        }
+    </script>
+</body>
+</html>
