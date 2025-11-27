@@ -1685,6 +1685,7 @@
              document.getElementById("reinicio").style.display = "none";
         }
 
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
         // FASE 4 - LÓGICA DE SIMULACIÓN DE IA (MEJORADA Y CORREGIDA)
         async function analizarRutaIA() {
             const fileInput = document.getElementById('imagen-ruta');
@@ -1789,11 +1790,12 @@
         // Download PDF functionality
         document.addEventListener('DOMContentLoaded', function() {
             const downloadBtn = document.querySelector('.download-btn');
-            if (downloadBtn) {
-                downloadBtn.addEventListener('click', function() {
-                    alert('Generando informe PDF... En una implementación real, esto descargaría el archivo generado con los datos de la IA.');
-                });
-            }
+           if (downloadBtn) {
+            downloadBtn.addEventListener('click', function() {
+                generarPDFdeIA();
+            });
+        }
+
             
             // ATTACH EVENT LISTENERS FOR MENU ITEMS (Fixing the main navigation issue)
             document.querySelectorAll('.menu-item').forEach(item => {
@@ -1818,6 +1820,51 @@
             link.click();
             alert(`Simulación de descarga/visualización del archivo: ${nombrePDF}`);
         }
+
+        function generarPDFdeIA() {
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF();
+
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(18);
+    doc.text("Informe Predictivo de Logística Internacional", 10, 15);
+
+    doc.setFontSize(12);
+    doc.setFont("helvetica", "normal");
+    doc.text("Este informe ha sido generado mediante análisis inteligente de la imagen de la ruta y deducción del modelo IA.", 10, 25);
+
+    doc.text("----------------------------------------------------", 10, 30);
+
+    doc.text("Resultado General:", 10, 40);
+    doc.text(document.getElementById('resultado-general').textContent, 10, 47);
+
+    doc.text("Origen:", 10, 60);
+    doc.text(document.getElementById('resultado-origen').textContent, 10, 67);
+
+    doc.text("Destino:", 10, 80);
+    doc.text(document.getElementById('resultado-destino').textContent, 10, 87);
+
+    doc.text("Tiempo Estimado:", 10, 100);
+    doc.text(document.getElementById('resultado-tiempo').textContent, 10, 107);
+
+    doc.text("Tipo de Carga:", 10, 120);
+    doc.text(document.getElementById('resultado-carga').textContent, 10, 127);
+
+    doc.text("Resumen Final:", 10, 140);
+    doc.text(document.getElementById('resultado-resumen').textContent, 10, 147);
+
+    doc.text("Riesgos y recomendaciones:", 10, 165);
+    
+    const riesgos = document.querySelectorAll('#resultado-riesgos li');
+    let y = 172;
+    riesgos.forEach(r => {
+        doc.text("- " + r.textContent, 10, y);
+        y += 7;
+    });
+
+    doc.save("informe_logistico.pdf");
+}
+
     </script>
 </body>
 </html>
